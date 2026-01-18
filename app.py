@@ -232,7 +232,8 @@ with st.sidebar:
 col_h1, col_h2 = st.columns([2, 1])
 
 with col_h1:
-    st.markdown("""
+    import textwrap
+    st.markdown(textwrap.dedent("""
     <div style="text-align: left;">
         <h1 class="title-text">Learnixis</h1>
         <p class="subtitle-text" style="margin-top: -10px;">Ignite Your Learning Potential</p>
@@ -265,7 +266,7 @@ with col_h1:
                 50% { opacity: 0; }
             }
         </style>
-    </div>""", unsafe_allow_html=True)
+    </div>"""), unsafe_allow_html=True)
 
 with col_h2:
     # Motivation Card
