@@ -228,7 +228,26 @@ with st.sidebar:
 col_h1, col_h2 = st.columns([2, 1])
 
 with col_h1:
-    st.markdown('<div style="text-align: left;"><h1 class="title-text">Learnixis</h1><p class="subtitle-text">Ignite Your Learning Potential</p></div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: left;">
+        <h1 class="title-text">Learnixis</h1>
+        <p class="subtitle-text" style="margin-top: -15px;">Ignite Your Learning Potential</p>
+        
+        <!-- NEW: Student News / Innovation Link -->
+        <div style="
+            display: inline-block;
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 5px 15px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #22d3ee;
+        ">
+            📢 <span style="color: #e2e8f0;">Latest:</span> <a href="#" style="color: #00C9FF; text-decoration: none; font-weight: 600;">CBSE 2025 Exam Dates Announced! 📅</a>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 with col_h2:
     # Motivation Card
@@ -411,7 +430,15 @@ else:
     # Empty State - Home Page Info (Native Streamlit Components)
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("### 🚀 Welcome to Your Personal Learning Hub")
-    st.markdown("Select a **Subject** and **Chapter** from the sidebar to access:")
+    
+    # High Visibility Instruction
+    st.markdown("""
+    <div style="background-color: rgba(30, 41, 59, 0.8); border-left: 5px solid #00C9FF; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <p style="color: #e2e8f0; font-size: 1.2rem; margin: 0;">
+            👈 Please select a <span style="color: #00C9FF; font-weight: 800;">Subject</span> and <span style="color: #92FE9D; font-weight: 800;">Chapter</span> from the sidebar to start!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     st.markdown("<br>", unsafe_allow_html=True)
     
