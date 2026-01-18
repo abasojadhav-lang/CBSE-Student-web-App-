@@ -239,10 +239,14 @@ with col_h2:
     quote = get_random_motivation()
     st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-right: 4px solid #00C9FF;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         padding: 20px 20px;
-        border-radius: 10px 0 0 10px;
+        border-radius: 12px;
         margin-top: 10px;
         text-align: right;
         min-height: 80px;
