@@ -210,6 +210,24 @@ with st.sidebar:
 
     st.header("📚 Curriculum")
     
+    # CBSE Only Disclaimer
+    st.markdown("""
+    <div style="
+        background: rgba(234, 179, 8, 0.15); 
+        border: 1px solid #eab308;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-bottom: 20px;
+    ">
+        <div style="color: #fca5a5; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 6px;">
+            ⚠️ <span>NOTE: FOR CBSE ONLY</span>
+        </div>
+        <div style="color: #94a3b8; font-size: 0.8em; margin-top: 4px;">
+            (Other Boards In Progress 🚧)
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
     subject = st.selectbox(
         "Select Subject",
         ["Physics", "Chemistry", "Biology", "Mathematics"]
