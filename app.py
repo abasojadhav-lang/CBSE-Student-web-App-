@@ -45,11 +45,12 @@ st.markdown("""
     }
     
     .subtitle-text {
-        font-size: 1.2rem;
-        color: #B0B0B0;
-        font-weight: 400;
+        font-size: 1.5rem !important;
+        color: #38bdf8 !important; /* Bright Sky Blue */
+        font-weight: 600 !important;
         margin-top: -5px;
         margin-bottom: 20px;
+        letter-spacing: 1px;
     }
     
     /* 4. Professional Buttons */
@@ -228,26 +229,7 @@ with st.sidebar:
 col_h1, col_h2 = st.columns([2, 1])
 
 with col_h1:
-    st.markdown("""
-    <div style="text-align: left;">
-        <h1 class="title-text">Learnixis</h1>
-        <p class="subtitle-text" style="margin-top: -15px;">Ignite Your Learning Potential</p>
-        
-        <!-- NEW: Student News / Innovation Link -->
-        <div style="
-            display: inline-block;
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid #334155;
-            border-radius: 20px;
-            padding: 5px 15px;
-            margin-top: 10px;
-            font-size: 0.85rem;
-            color: #22d3ee;
-        ">
-            📢 <span style="color: #e2e8f0;">Latest:</span> <a href="#" style="color: #00C9FF; text-decoration: none; font-weight: 600;">CBSE 2025 Exam Dates Announced! 📅</a>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div style="text-align: left;"><h1 class="title-text">Learnixis</h1><p class="subtitle-text" style="margin-top: -10px;">Ignite Your Learning Potential</p></div>', unsafe_allow_html=True)
 
 with col_h2:
     # Motivation Card
