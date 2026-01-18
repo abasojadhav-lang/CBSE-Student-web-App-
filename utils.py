@@ -89,15 +89,15 @@ def search_videos(query: str, subject: str = "Physics"):
                 'views': '2.5M'
             },
             {
-                'title': f'{query} - Key Concepts Summary',
-                'link': 'https://www.youtube.com/watch?v=6dfbXgW2rQk', # Generic Educational Video
-                'thumbnail': 'https://i.ytimg.com/vi/6dfbXgW2rQk/hqdefault.jpg',
-                'channel': 'Learnohub',
-                'duration': '15:00',
-                'views': '1.2M'
+                'title': f'{query} - Concepts Recap',
+                'link': 'https://www.youtube.com/watch?v=1xSqZW1HaKE', # Valid Khan Academy/Similar
+                'thumbnail': 'https://i.ytimg.com/vi/1xSqZW1HaKE/hqdefault.jpg',
+                'channel': 'Khan Academy',
+                'duration': '12:30',
+                'views': '900K'
             },
             {
-                'title': 'Exam Motivation & Tips',
+                'title': 'Study Motivation',
                 'link': 'https://www.youtube.com/watch?v=bMknfKXIFA8',
                 'thumbnail': 'https://i.ytimg.com/vi/bMknfKXIFA8/hqdefault.jpg',
                 'channel': 'MotivationHub',

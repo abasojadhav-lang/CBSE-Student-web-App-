@@ -150,6 +150,21 @@ st.markdown("""
         background-color: #1e293b !important;
         color: #00C9FF !important;
     }
+    
+    /* FORCE VISIBILITY FOR SIDEBAR LABELS */
+    .st-emotion-cache-16idsys p, .st-emotion-cache-10trblm, label, .stMarkdown p {
+        color: #e2e8f0 !important;
+        font-weight: 500 !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Sidebar Headers */
+    section[data-testid="stSidebar"] h1, 
+    section[data-testid="stSidebar"] h2, 
+    section[data-testid="stSidebar"] h3 {
+        color: #00C9FF !important; /* Bright Cyan */
+        text-shadow: 0 0 10px rgba(0, 201, 255, 0.3);
+    }
 </style>
 """, unsafe_allow_html=True)
 
