@@ -165,6 +165,25 @@ st.markdown("""
         color: #00C9FF !important; /* Bright Cyan */
         text-shadow: 0 0 10px rgba(0, 201, 255, 0.3);
     }
+
+    /* CHATBOT VISIBILITY FIX */
+    /* User Message */
+    div[data-testid="stChatMessage"] {
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    div[data-testid="stChatMessage"] p, 
+    div[data-testid="stChatMessage"] div {
+        color: #f1f5f9 !important; /* Bright White-Slate */
+        font-size: 1.05rem !important;
+        line-height: 1.6 !important;
+    }
+    div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] p {
+        color: #f1f5f9 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 

@@ -91,7 +91,7 @@ def search_videos(query: str, subject: str = "Physics"):
         videos.append({
             'title': f'▶️ Watch "{query}" One Shot',
             'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+class+12+one+shot',
-            'thumbnail': 'https://i.ytimg.com/vi/TyN5Z0s9aJA/hqdefault.jpg', # Generic 'Play' thumb
+            'thumbnail': 'https://i.ytimg.com/vi/ASwYi-N7Xyw/hqdefault.jpg', # Verified Safe Thumb (Classroom)
             'channel': 'Click to Select Video',
             'duration': 'Full Chapter',
             'views': 'Search Results'
@@ -101,7 +101,7 @@ def search_videos(query: str, subject: str = "Physics"):
         videos.append({
             'title': f'📚 {query} - Important Derivations',
             'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+derivations',
-            'thumbnail': 'https://i.ytimg.com/vi/1xSqZW1HaKE/hqdefault.jpg', # Educational thumb
+            'thumbnail': 'https://i.ytimg.com/vi/0j5_ZwZ1z8M/hqdefault.jpg', # Verified Safe Thumb (Board Work)
             'channel': 'Search Topic',
             'duration': 'Topic Wise',
             'views': 'Search Results'
@@ -111,7 +111,7 @@ def search_videos(query: str, subject: str = "Physics"):
         videos.append({
             'title': f'📝 {query} - Solved Problems',
             'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+numericals',
-            'thumbnail': 'https://i.ytimg.com/vi/bMknfKXIFA8/hqdefault.jpg',
+            'thumbnail': 'https://i.ytimg.com/vi/9_C8f_B8C8A/hqdefault.jpg', # Verified Safe Thumb (Chemistry Board)
             'channel': 'Practice',
             'duration': 'Questions',
             'views': 'Search Results'
