@@ -207,6 +207,9 @@ with st.sidebar:
             """, unsafe_allow_html=True)
     
     st.divider()
+    
+    # Simple, Indentation-Safe Disclaimer (Moved)
+    st.markdown('<p style="color: #fbbf24; font-weight: 600; font-size: 0.9rem; margin-bottom: 20px; margin-top: -15px;">⚠️ for CBSE Board (others soon!)</p>', unsafe_allow_html=True)
 
     st.header("📚 Curriculum")
     
