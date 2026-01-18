@@ -1,0 +1,241 @@
+from youtubesearchpython import VideosSearch
+import random
+import time
+
+def parse_duration_to_minutes(duration_str: str) -> float:
+    """Parses 'MM:SS' or 'HH:MM:SS' into minutes."""
+    if not duration_str:
+        return 0.0
+    
+    parts = duration_str.split(':')
+    try:
+        if len(parts) == 2: # MM:SS
+            return int(parts[0]) + int(parts[1]) / 60
+        elif len(parts) == 3: # HH:MM:SS
+            return int(parts[0]) * 60 + int(parts[1]) + int(parts[2]) / 60
+    except ValueError:
+        return 0.0
+    return 0.0
+
+def search_videos(query: str, subject: str = "Physics"):
+    """
+    Searches for videos and returns a balanced mix of:
+    - 1 Long (One Shot/Full Chapter > 45m)
+    - 2 Medium (Topic Explanations 10-45m)
+    - 2 Short (Quick concepts < 10m)
+    """
+    # Enhance query for educational content
+    search_query = f"{query} {subject} class 11 12 CBSE explained"
+    
+    try:
+        try:
+            # Fetch more results to allow filtering
+            videosSearch = VideosSearch(search_query, limit=20)
+            results = videosSearch.result()
+        except TypeError: 
+            # Fallback for library crash (missing channel ID)
+            # Try simpler query
+            print(f"Library crash for '{search_query}', retrying...")
+            fallback_query = f"{query} {subject} video"
+            videosSearch = VideosSearch(fallback_query, limit=10)
+            results = videosSearch.result()
+        
+        if not results or 'result' not in results:
+            return []
+            
+        videos = results['result']
+        
+        long_videos = []
+        medium_videos = []
+        short_videos = []
+        
+        for video in videos:
+            duration = video.get('duration')
+            if not duration:
+                continue
+                
+            minutes = parse_duration_to_minutes(duration)
+            
+            video_data = {
+                'id': video.get('id'),
+                'title': video.get('title'),
+                'thumbnail': video.get('thumbnails')[0]['url'] if video.get('thumbnails') else '',
+                'link': video.get('link'),
+                'duration': duration,
+                'channel': video.get('channel', {}).get('name', 'Unknown'),
+                'views': video.get('viewCount', {}).get('short', '0 views')
+            }
+            
+            if minutes > 45:
+                long_videos.append(video_data)
+            elif minutes > 10:
+                medium_videos.append(video_data)
+            else:
+                short_videos.append(video_data)
+                
+        # Selection Logic
+        final_list = []
+        
+        # 1. Add Best Long Video (One Shot)
+        if long_videos:
+            final_list.append(long_videos[0])
+            
+        # 2. Add Medium Videos (Topics)
+        final_list.extend(medium_videos[:2])
+        
+        # 3. Add Short Videos (Quick Revision)
+        final_list.extend(short_videos[:2])
+        
+        # Fill gaps if any category is missing
+        needed = 5 - len(final_list)
+        if needed > 0:
+            remaining = [v for v in (long_videos + medium_videos + short_videos) if v not in final_list]
+            final_list.extend(remaining[:needed])
+            
+        return final_list
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        print(f"Error searching videos: {e}")
+        return []
+
+def generate_questions(topic: str):
+    """Generates 50 mock Q&A for a topic using templates."""
+    
+    templates = [
+        ("What is the fundamental principle of {topic}?", "The principle states that..."),
+        ("Define {topic} and give its SI unit.", "Definition: ... SI Unit: ..."),
+        ("Explain the application of {topic} in daily life.", "It is used in..."),
+        ("Derive the expression for {topic}.", "Derivations steps: 1... 2..."),
+        ("Differentiate between {topic} and its inverse.", "Key differences..."),
+        ("Draw the diagram for {topic}.", "Diagram should include..."),
+        ("What are the limitations of {topic} theory?", "Limitations are..."),
+        ("Solve a numerical based on {topic}.", "Given X, Y... Answer is Z."),
+        ("Why is {topic} considered a vector/scalar?", "Because it has magnitude..."),
+        ("State the laws governing {topic}.", "The laws are..."),
+    ]
+    
+    variations = [
+        "in modern physics", "at high temperatures", "in a vacuum", "under standard conditions",
+        "conceptually", "mathematically", "historically", "experimentally"
+    ]
+    
+    questions = []
+    qt_count = 1
+    
+    # Real Static Question Bank (Curated for Demo)
+    # in a real app, this would be a database
+    
+    curated_db = {
+        "Electric Charges and Fields": [
+            ("What is Quantization of Charge?", "Quantization of charge implies that charge implies that electric charge comes in discrete packets rather than being continuous. The total charge (q) of a body is always an integral multiple of the basic quantum of charge (e), which is the charge of an electron ($1.6 \\times 10^{-19} C$). This property can be mathematically expressed as $q = ne$, where n is an integer (positive or negative). This principle holds true at macroscopic scales but is most significant at microscopic levels."),
+            ("State Coulomb's Law.", "Coulomb's Law quantifies the electrostatic force between two stationary point charges. It states that the magnitude of the electrostatic force of attraction or repulsion between two point charges is directly proportional to the product of the magnitudes of charges and inversely proportional to the square of the distance between them. The force acts along the line joining the two charges. Mathematically, $F = k \\frac{|q_1 q_2|}{r^2}$, where $k$ is the electrostatic constant."),
+            ("Define Electric Dipole Moment.", "The Electric Dipole Moment (p) is a vector quantity defined as the product of the magnitude of one of the charges and the separation distance between them. If two charges $+q$ and $-q$ are separated by a distance $2a$, the dipole moment is given by $p = q \\times 2a$. Its direction is conventionally defined from the negative charge to the positive charge. It determines the strength of the dipole's interaction with an external electric field."),
+            ("What are Electric Field Lines?", "Electric field lines are a pictorial representation of the electric field in a region of space. They are imaginary smooth curves drawn such that the tangent to the curve at any point gives the direction of the electric field vector at that point. Key properties include: they originate from positive charges and terminate on negative charges, they never intersect each other, and their density represents the field strength."),
+            ("State Gauss's Law.", "Gauss's Law relates the net electric flux through a closed surface to the net charge enclosed by that surface. It states that the total electric flux ($\\phi$) through a closed gaussian surface is equal to $\\frac{1}{\\epsilon_0}$ times the net charge ($q_{enclosed}$) enclosed by the surface. It is a fundamental law in electromagnetism and is particularly useful for calculating fields in symmetric charge distributions."),
+            ("Why can't two electric field lines intersect?", "If two electric field lines were to intersect at a specific point, it would imply that there are two distinct tangents at that single point. Since the tangent represents the direction of the electric field, this would mean the electric field has two different directions at the same location, which is physically impossible. Therefore, electric field lines can never cross each other.")
+        ],
+        "Structure of Atom": [
+            ("What are the limitations of Rutherford's Model?", "Rutherford's model had two major limitations. Firstly, it could not explain the stability of the atom; according to classical electromagnetic theory, an accelerating charged particle (electron) should continuously radiate energy and spiral into the nucleus, implying matter is unstable. Secondly, it failed to explain the discrete line spectra observed for elements like Hydrogen, as a continuous loss of energy would result in a continuous spectrum."),
+            ("State Bohr's Postulates.", "Bohr proposed three key postulates to resolve Rutherford's issues: 1. Electrons revolve around the nucleus in specific 'stationary' orbits without radiating energy. 2. An electron can orbit only in those shells where its angular momentum is an integral multiple of $h/2\\pi$ ($L = nh/2\\pi$). 3. Energy is emitted or absorbed only when an electron makes a transition from one stationary orbit to another, given by $\\Delta E = E_2 - E_1 = h\\nu$."),
+            ("Define Isotopes and Isobars.", "Isotopes are atoms of the same element that have the same atomic number (number of protons) but different mass numbers (number of neutrons). For example, Carbon-12 and Carbon-14 are isotopes. Isobars, on the other hand, are atoms of different chemical elements that share the same mass number but have different atomic numbers. For example, Argon-40 and Calcium-40 are isobars."),
+            ("What is the Photoelectric Effect?", "The Photoelectric Effect is the phenomenon where electrons are ejected from a metal surface when electromagnetic radiation (light) of a sufficiently high frequency is incident upon it. The emitted electrons are called photoelectrons. This phenomenon provided strong evidence for the particle nature of light (photons) and established that energy exchange occurs in discrete quanta."),
+            ("Define Heisenberg's Uncertainty Principle.", "Heisenberg's Uncertainty Principle states that it is fundamentally impossible to measure simultaneously both the exact position and the exact momentum of a microscopic particle with absolute accuracy. The product of the uncertainties in position ($\\Delta x$) and momentum ($\\Delta p$) is always greater than or equal to $h/4\\pi$. Mathematically, $\\Delta x \\cdot \\Delta p \\geq \\frac{h}{4\\pi}$."),
+            ("What is an Orbital?", "An orbital is a mathematical function that describes the wave-like behavior of an electron in an atom. In physical terms, it represents a specific three-dimensional region in space around the nucleus where the probability of finding an electron is maximum (typically greater than 90%). Orbitals are characterized by quantum numbers (n, l, m) and have distinct shapes like s (spherical), p (dumbbell), etc.")
+        ],
+        "Solutions": [
+            ("Define Henry's Law.", "Henry's Law describes the solubility of a gas in a liquid. It states that at a constant temperature, the solubility of a gas in a liquid is directly proportional to the partial pressure of the gas present above the surface of the liquid or solution. Mathematically, $p = K_H \\cdot x$, where $p$ is the partial pressure, $x$ is the mole fraction of the gas in solution, and $K_H$ is Henry's Law constant."),
+            ("What is an Ideal Solution?", "An ideal solution is a solution that obeys Raoult's Law over the entire range of concentration and temperature. In such a solution, the intermolecular interactions between solute-solute (A-A) and solvent-solvent (B-B) particles are nearly identical to the interactions between solute-solvent (A-B) particles. Additionally, the enthalpy of mixing ($\\Delta H_{mix}$) and volume of mixing ($\\Delta V_{mix}$) are zero."),
+            ("Define Osmotic Pressure.", "Osmotic pressure is the minimum excess external pressure that must be applied to the solution side to strictly prevent the flow of pure solvent molecules into the solution through a semipermeable membrane. It is a colligative property denoted by $\\pi$ and is directly proportional to the molar concentration (C) and temperature (T), given by $\\pi = CRT$."),
+            ("What are Colligative Properties?", "Colligative properties are those properties of dilute solutions that depend solely on the number of solute particles (ions or molecules) present in a definite amount of solvent, and not on the chemical nature of the solute. The four main colligative properties are: Relative lowering of vapor pressure, Elevation of boiling point, Depression of freezing point, and Osmotic pressure."),
+            ("Define Molality.", "Molality (m) is a unit of concentration defined as the number of moles of solute dissolved per kilogram (kg) of the solvent. Unlike molarity, molality is independent of temperature because it involves masses, which do not change with temperature. It is calculated as: $m = \\frac{\\text{Moles of Solute}}{\\text{Mass of Solvent in kg}}$ .")
+        ]
+    }
+    
+    questions = []
+    qt_count = 1
+    
+    # 1. Try to fetch from Curated DB first
+    # Fuzzy match topic name logic could be added, but exact match for now
+    real_qa = curated_db.get(topic, [])
+    
+    # If not exact match, check for partial match
+    if not real_qa:
+        for key in curated_db:
+            if key in topic or topic in key:
+                real_qa = curated_db[key]
+                break
+    
+    for q_text, a_text in real_qa:
+        questions.append({
+            "id": qt_count,
+            "question": q_text,
+            "answer": a_text,
+            "difficulty": "Easy" if qt_count <= 3 else "Medium"
+        })
+        qt_count += 1
+    
+    # 2. Base concepts (Fallback/Generic - Paragraph length)
+    base_qs = [
+        ("Define the core concept of {topic}.", "The core concept defines the fundamental behavior of the system under observation. For {topic}, this involves examining how its primary constituents interact according to standard physical laws. Understanding this foundation is crucial because it governs the macroscopic properties we observe in experiments."),
+        ("State the governing principle/law.", "The governing law relates the input variables to the output result in a predictable manner. It is usually expressed as a reliable differential equation or conservation principle that remains valid under ideal conditions. This law acts as the backbone for solving numerical problems related to the topic."),
+        ("What are the standard units used?", "In the standard SI system, the units are derived from the basic physical quantities such as Mass (kg), Length (m), Time (s), and Current (A). It is critical to convert all given values into these standard units before performing any calculations to ensure dimensional consistency."),
+        ("Explain the significance of {topic}.", "{topic} is highly significant because it forms the theoretical basis for understanding complex natural systems. Its principles are widely applied in designing modern technology, optimizing industrial processes, and predicting natural phenomena with high accuracy."),
+        ("Derive the general equation.", "The derivation typically begins with the fundamental conservation of energy or mass. By applying the specific boundary conditions and integrating over the limits, we can solve for the specific trajectory or state. This mathematical proof validates the theoretical model against empirical data."),
+        ("List the applications in real life.", "The applications are vast and varied, including: 1. Optimization of industrial manufacturing processes to efficienty reduce waste. 2. Design of consumer electronics for better performance. 3. Development of advanced medical diagnostic tools based on this specific physical principle."),
+        ("What are the limitations?", "Every theory has its bounds. Limitations include: 1. Failure at extreme quantum scales where classical mechanics breaks down. 2. The assumption of ideal conditions (such as frictionless surfaces or massless strings) which don't exist in reality. 3. The high computational cost required to obtain exact solutions for complex systems.")
+    ]
+    
+    for q_text, a_text in base_qs:
+        questions.append({
+            "id": qt_count,
+            "question": q_text.format(topic=topic),
+            "answer": a_text.format(topic=topic),
+            "difficulty": "Easy" if qt_count < 15 else "Medium"
+        })
+        qt_count += 1
+
+    # 3. Fill the rest with Templates (up to 50)
+    needed = 50 - len(questions)
+    for i in range(needed):
+        tmpl_q, tmpl_a = random.choice(templates)
+        var = random.choice(variations)
+        
+        difficulty = "Easy"
+        if i > 10: difficulty = "Medium" 
+        if i > 20: difficulty = "Hard"
+        
+        full_q = f"{tmpl_q.format(topic=topic)} ({var})"
+        questions.append({
+            "id": qt_count,
+            "question": full_q,
+            "answer": f"{tmpl_a} This behavior is specifically observed when considering {var}. The general equation is modified to account for these specific conditions.",
+            "difficulty": difficulty
+        })
+        qt_count += 1
+        
+    return questions
+
+def get_random_motivation():
+    quotes = [
+        "“The beautiful thing about learning is that no one can take it away from you.”",
+        "“Education is the most powerful weapon which you can use to change the world.”",
+        "“Don’t let what you cannot do interfere with what you can do.”",
+        "“Success is the sum of small efforts, repeated day in and day out.”",
+        "“The expert in anything was once a beginner.”",
+        "“You don’t have to be great to start, but you have to start to be great.”",
+        "“Push yourself, because no one else is going to do it for you.”",
+        "“Believe you can and you’re halfway there.”",
+        "“Your limitation—it’s only your imagination.”",
+        "“Dream it. Wish it. Do it.”"
+    ]
+    return random.choice(quotes)
+
+def get_pyqs(subject: str):
+    """Generates mock PYQs."""
+    years = [2023, 2022, 2021, 2020]
+    return [
+        {"year": year, "set": f"Set {random.randint(1,3)}", "link": "#"}
+        for year in years
+    ]
