@@ -46,11 +46,14 @@ st.markdown("""
     
     .subtitle-text {
         font-size: 1.5rem !important;
-        color: #38bdf8 !important; /* Bright Sky Blue */
-        font-weight: 600 !important;
+        font-weight: 700 !important;
+        background: -webkit-linear-gradient(90deg, #4ade80, #38bdf8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-top: -5px;
         margin-bottom: 20px;
         letter-spacing: 1px;
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
     }
     
     /* 4. Professional Buttons */
@@ -238,16 +241,21 @@ with col_h2:
     <div style="
         background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         border-right: 4px solid #00C9FF;
-        padding: 10px;
+        padding: 20px 20px;
         border-radius: 10px 0 0 10px;
-        margin-top: 0px;
+        margin-top: 10px;
         text-align: right;
+        min-height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
     ">
         <p style="
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-style: italic;
             color: #94a3b8;
             margin: 0;
+            line-height: 1.4;
         ">{quote}</p>
     </div>
     """, unsafe_allow_html=True)
