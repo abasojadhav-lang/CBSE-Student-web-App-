@@ -411,33 +411,33 @@ else:
     # Empty State
     # Empty State - Home Page Info
     st.markdown("""
-    <div style="text-align:center; padding: 40px 20px;">
-        <h2 style="color: #60a5fa; margin-bottom: 30px;">Welcome to Your Personal Learning Hub 🚀</h2>
-        
-        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
-            
-            <!-- Feature 1 -->
-            <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; width: 300px; text-align: left;">
-                <h3 style="color: #00C9FF; margin-top: 0;">📺 Curated Video Lectures</h3>
-                <p style="color: #e2e8f0; font-size: 0.95rem;">Access hand-picked, high-quality video tutorials for every chapter. From "One Shots" for quick revision to deep-dive concept explanations.</p>
-            </div>
+<div style="text-align:center; padding: 40px 20px;">
+<h2 style="color: #60a5fa; margin-bottom: 30px;">Welcome to Your Personal Learning Hub 🚀</h2>
 
-            <!-- Feature 2 -->
-            <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; width: 300px; text-align: left;">
-                <h3 style="color: #92FE9D; margin-top: 0;">📝 Smart Q&A & PDFs</h3>
-                <p style="color: #e2e8f0; font-size: 0.95rem;">Generate 50+ exam-focused questions instantly. Download comprehensive Q&A PDFs and Previous Year Papers for offline practice.</p>
-            </div>
-
-            <!-- Feature 3 -->
-            <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; width: 300px; text-align: left;">
-                <h3 style="color: #F6416C; margin-top: 0;">🤖 24/7 AI Tutor</h3>
-                <p style="color: #e2e8f0; font-size: 0.95rem;">Stuck on a concept? Ask our AI Tutor for instant definitions, formulas, and problem-solving steps specific to your chapter.</p>
-            </div>
-            
-        </div>
-        
-        <div style="margin-top: 40px; color: #94a3b8; font-style: italic;">
-            👈 Select a Subject and Chapter from the sidebar to start your journey.
-        </div>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
+    
+    <!-- Feature 1 -->
+    <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; width: 300px; text-align: left;">
+        <h3 style="color: #00C9FF; margin-top: 0;">📺 Curated Video Lectures</h3>
+        <p style="color: #e2e8f0; font-size: 0.95rem;">Access hand-picked, high-quality video tutorials for every chapter. From "One Shots" for quick revision to deep-dive concept explanations.</p>
     </div>
-    """, unsafe_allow_html=True)
+
+    <!-- Feature 2 -->
+    <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; width: 300px; text-align: left;">
+        <h3 style="color: #92FE9D; margin-top: 0;">📝 Smart Q&A & PDFs</h3>
+        <p style="color: #e2e8f0; font-size: 0.95rem;">Generate 50+ exam-focused questions instantly. Download comprehensive Q&A PDFs and Previous Year Papers for offline practice.</p>
+    </div>
+
+    <!-- Feature 3 -->
+    <div style="background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; width: 300px; text-align: left;">
+        <h3 style="color: #F6416C; margin-top: 0;">🤖 24/7 AI Tutor</h3>
+        <p style="color: #e2e8f0; font-size: 0.95rem;">Stuck on a concept? Ask our AI Tutor for instant definitions, formulas, and problem-solving steps specific to your chapter.</p>
+    </div>
+    
+</div>
+
+<div style="margin-top: 40px; color: #94a3b8; font-style: italic;">
+    👈 Select a Subject and Chapter from the sidebar to start your journey.
+</div>
+</div>
+""", unsafe_allow_html=True)
