@@ -232,42 +232,7 @@ with st.sidebar:
 col_h1, col_h2 = st.columns([2, 1])
 
 with col_h1:
-    header_html = """
-<div style="text-align: left;">
-    <h1 class="title-text">Learnixis</h1>
-    <p class="subtitle-text" style="margin-top: -10px;">Ignite Your Learning Potential</p>
-    
-    <div style="
-        background: rgba(234, 179, 8, 0.1); 
-        border: 1px solid #eab308;
-        border-radius: 5px;
-        padding: 5px 10px;
-        margin-top: 5px;
-        display: flex;
-        align-items: center;
-        width: fit-content;
-    ">
-        <span style="
-            color: #fca5a5; 
-            font-weight: 800; 
-            font-size: 0.85rem; 
-            margin-right: 10px;
-            animation: blinker 1.5s linear infinite;
-        ">⚠️ NOTE:</span>
-        
-        <marquee scrollamount="5" style="color: #cbd5e1; font-size: 0.85rem; width: 250px;">
-            Currently for <b>CBSE Board</b> Students Only. Other Boards are currently in progress... 🚧
-        </marquee>
-    </div>
-    
-    <style>
-        @keyframes blinker {
-            50% { opacity: 0; }
-        }
-    </style>
-</div>
-"""
-    st.markdown(header_html, unsafe_allow_html=True)
+    st.markdown('<div style="text-align: left;"><h1 class="title-text">Learnixis</h1><p class="subtitle-text" style="margin-top: -10px;">Ignite Your Learning Potential</p></div>', unsafe_allow_html=True)
 
 with col_h2:
     # Motivation Card
