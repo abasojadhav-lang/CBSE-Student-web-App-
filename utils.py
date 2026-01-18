@@ -76,35 +76,40 @@ def search_videos(query: str, subject: str = "Physics"):
     except Exception as e:
         print(f"Dynamic search failed: {e}")
     
-    # 3. Ultimate Fallback (Ensure user sees SOMETHING PLAYABLE)
+    # 3. Ultimate Fallback (Ensure user sees SOMETHING PLAYABLE & RELEVANT)
     if not videos:
-        # Provide a Generic "How to Study" or General Subject video that ACTUALLY PLAYS
-        videos = [
-            {
-                'title': f'Complete Class 12 {subject} Strategy',
-                'link': 'https://www.youtube.com/watch?v=TyN5Z0s9aJA', # Valid Strategy Video
-                'thumbnail': 'https://i.ytimg.com/vi/TyN5Z0s9aJA/hqdefault.jpg', 
-                'channel': 'Physics Wallah',
-                'duration': '10:00',
-                'views': '2.5M'
-            },
-            {
-                'title': f'{query} - Concepts Recap',
-                'link': 'https://www.youtube.com/watch?v=1xSqZW1HaKE', # Valid Khan Academy/Similar
-                'thumbnail': 'https://i.ytimg.com/vi/1xSqZW1HaKE/hqdefault.jpg',
-                'channel': 'Khan Academy',
-                'duration': '12:30',
-                'views': '900K'
-            },
-            {
-                'title': 'Study Motivation',
-                'link': 'https://www.youtube.com/watch?v=bMknfKXIFA8',
-                'thumbnail': 'https://i.ytimg.com/vi/bMknfKXIFA8/hqdefault.jpg',
-                'channel': 'MotivationHub',
-                'duration': '05:00',
-                'views': '5M'
-            }
-        ]
+        # Instead of showing the SAME videos for every chapter, we generate 
+        # SMART SEARCH CARDS that link to the specific topic query.
+        
+        # Link 1: YouTube Search for "One Shot"
+        videos.append({
+            'title': f'▶️ Watch "{query}" One Shot',
+            'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+class+12+one+shot',
+            'thumbnail': 'https://i.ytimg.com/vi/TyN5Z0s9aJA/hqdefault.jpg', # Generic 'Play' thumb
+            'channel': 'Click to Select Video',
+            'duration': 'Full Chapter',
+            'views': 'Search Results'
+        })
+        
+        # Link 2: Verified Playlist/Notes Search
+        videos.append({
+            'title': f'📚 {query} - Important Derivations',
+            'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+derivations',
+            'thumbnail': 'https://i.ytimg.com/vi/1xSqZW1HaKE/hqdefault.jpg', # Educational thumb
+            'channel': 'Search Topic',
+            'duration': 'Topic Wise',
+            'views': 'Search Results'
+        })
+        
+        # Link 3: Solved Examples
+        videos.append({
+            'title': f'📝 {query} - Solved Problems',
+            'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+numericals',
+            'thumbnail': 'https://i.ytimg.com/vi/bMknfKXIFA8/hqdefault.jpg',
+            'channel': 'Practice',
+            'duration': 'Questions',
+            'views': 'Search Results'
+        })
 
     return videos
 
