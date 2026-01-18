@@ -210,24 +210,6 @@ with st.sidebar:
 
     st.header("📚 Curriculum")
     
-    # CBSE Only Disclaimer
-    st.markdown("""
-    <div style="
-        background: rgba(234, 179, 8, 0.15); 
-        border: 1px solid #eab308;
-        border-radius: 8px;
-        padding: 8px 12px;
-        margin-bottom: 20px;
-    ">
-        <div style="color: #fca5a5; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 6px;">
-            ⚠️ <span>NOTE: FOR CBSE ONLY</span>
-        </div>
-        <div style="color: #94a3b8; font-size: 0.8em; margin-top: 4px;">
-            (Other Boards In Progress 🚧)
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
     subject = st.selectbox(
         "Select Subject",
         ["Physics", "Chemistry", "Biology", "Mathematics"]
@@ -250,7 +232,40 @@ with st.sidebar:
 col_h1, col_h2 = st.columns([2, 1])
 
 with col_h1:
-    st.markdown('<div style="text-align: left;"><h1 class="title-text">Learnixis</h1><p class="subtitle-text" style="margin-top: -10px;">Ignite Your Learning Potential</p></div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: left;">
+        <h1 class="title-text">Learnixis</h1>
+        <p class="subtitle-text" style="margin-top: -10px;">Ignite Your Learning Potential</p>
+        
+        <div style="
+            background: rgba(234, 179, 8, 0.1); 
+            border: 1px solid #eab308;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            width: fit-content;
+        ">
+            <span style="
+                color: #fca5a5; 
+                font-weight: 800; 
+                font-size: 0.85rem; 
+                margin-right: 10px;
+                animation: blinker 1.5s linear infinite;
+            ">⚠️ NOTE:</span>
+            
+            <marquee scrollamount="5" style="color: #cbd5e1; font-size: 0.85rem; width: 250px;">
+                Currently for <b>CBSE Board</b> Students Only. Other Boards are currently in progress... 🚧
+            </marquee>
+        </div>
+        
+        <style>
+            @keyframes blinker {
+                50% { opacity: 0; }
+            }
+        </style>
+    </div>""", unsafe_allow_html=True)
 
 with col_h2:
     # Motivation Card
