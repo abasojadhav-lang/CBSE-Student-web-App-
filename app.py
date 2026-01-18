@@ -122,16 +122,33 @@ st.markdown("""
 
     /* Sidebar Dropdown Styling - Premium Look */
     div[data-testid="stSidebar"] div[data-baseweb="select"] > div {
-        background-color: #1e293b;
-        border: 1px solid #3b82f6;
+        background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid #60a5fa;
         color: white;
         border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    div[data-testid="stSidebar"] div[data-baseweb="select"] > div:hover {
+        border-color: #00C9FF;
+        box-shadow: 0 0 8px rgba(0, 201, 255, 0.3);
+    }
+
+    /* Target the dropdown text explicitly */
+    div[data-testid="stSidebar"] div[data-baseweb="select"] span {
+        font-weight: 600;
+        color: #e2e8f0;
     }
     
     /* Dropdown Options Styling */
     div[data-baseweb="popover"], div[data-baseweb="menu"] {
-        background-color: #0f172a;
+        background-color: #0f172a !important;
         border: 1px solid #334155;
+    }
+    
+    div[data-baseweb="menu"] li:hover {
+        background-color: #1e293b !important;
+        color: #00C9FF !important;
     }
 </style>
 """, unsafe_allow_html=True)
