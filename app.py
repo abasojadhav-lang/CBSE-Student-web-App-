@@ -109,6 +109,16 @@ st.markdown("""
     .founder-img {
          border: 2px solid #00C9FF;
     }
+    
+    /* FIX: Force White Text in Expanders for Deploy */
+    .streamlit-expanderContent, .streamlit-expanderHeader {
+        color: #e2e8f0 !important;
+    }
+    div[data-testid="stExpander"] p, 
+    div[data-testid="stExpander"] div,
+    div[data-testid="stExpander"] span {
+        color: #e2e8f0 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
