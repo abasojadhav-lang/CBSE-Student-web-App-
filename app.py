@@ -119,6 +119,20 @@ st.markdown("""
     div[data-testid="stExpander"] span {
         color: #e2e8f0 !important;
     }
+
+    /* Sidebar Dropdown Styling - Premium Look */
+    div[data-testid="stSidebar"] div[data-baseweb="select"] > div {
+        background-color: #1e293b;
+        border: 1px solid #3b82f6;
+        color: white;
+        border-radius: 8px;
+    }
+    
+    /* Dropdown Options Styling */
+    div[data-baseweb="popover"], div[data-baseweb="menu"] {
+        background-color: #0f172a;
+        border: 1px solid #334155;
+    }
 </style>
 """, unsafe_allow_html=True)
 

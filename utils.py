@@ -39,6 +39,13 @@ def search_videos(query: str, subject: str = "Physics"):
         "Solutions": [
              {"id": "s8", "title": "Solutions Class 12 Chemistry One Shot", "link": "https://www.youtube.com/watch?v=JkKeq_B8C8A", "thumbnail": "https://i.ytimg.com/vi/JkKeq_B8C8A/hqdefault.jpg", "channel": "Bharat Panchal", "duration": "01:45:00", "views": "2M"},
              {"id": "s9", "title": "Colligative Properties Made Easy", "link": "https://www.youtube.com/watch?v=LkKeq_B8C8A", "thumbnail": "https://i.ytimg.com/vi/JkKeq_B8C8A/hqdefault.jpg", "channel": "Gravity Circle", "duration": "20:00", "views": "600K"}
+        ],
+        "Motion in a Plane": [
+            {"id": "s10", "title": "Motion in a Plane - Full Chapter | Class 11", "link": "https://www.youtube.com/watch?v=M89-1-P2iK4", "thumbnail": "https://i.ytimg.com/vi/M89-1-P2iK4/hqdefault.jpg", "channel": "Physics Wallah", "duration": "02:10:00", "views": "4.5M"},
+            {"id": "s11", "title": "Vectors & Projectile Motion", "link": "https://www.youtube.com/watch?v=j1aC1_tZc7w", "thumbnail": "https://i.ytimg.com/vi/j1aC1_tZc7w/hqdefault.jpg", "channel": "Unacademy", "duration": "45:00", "views": "1.2M"}
+        ],
+        "Laws of Motion": [
+            {"id": "s12", "title": "Laws of Motion - One Shot | Class 11", "link": "https://www.youtube.com/watch?v=6dfbXgW2rQk", "thumbnail": "https://i.ytimg.com/vi/6dfbXgW2rQk/hqdefault.jpg", "channel": "Learnohub", "duration": "01:50:00", "views": "3M"}
         ]
         # Add more mappings as needed
     }
@@ -69,24 +76,24 @@ def search_videos(query: str, subject: str = "Physics"):
     except Exception as e:
         print(f"Dynamic search failed: {e}")
     
-    # 3. Ultimate Fallback (Ensure user sees SOMETHING)
+    # 3. Ultimate Fallback (Ensure user sees SOMETHING PLAYABLE)
     if not videos:
-        # Generate smart search links instead of purely broken content
+        # Provide a Generic "How to Study" or General Subject video that ACTUALLY PLAYS
         videos = [
             {
-                'title': f'▶️ Watch {query} on YouTube',
-                'link': 'https://www.youtube.com/results?search_query=' + query.replace(" ", "+") + "+class+12",
-                'thumbnail': 'https://img.youtube.com/vi/6dfbXgW2rQk/hqdefault.jpg', 
-                'channel': 'Click to Open',
-                'duration': 'Full List',
-                'views': '-'
+                'title': f'Complete {subject} Strategy & Overview',
+                'link': 'https://www.youtube.com/watch?v=ar7RjA4Vn_M', # Generic Strategy Video
+                'thumbnail': 'https://i.ytimg.com/vi/ar7RjA4Vn_M/hqdefault.jpg', 
+                'channel': 'Learnixis Guide',
+                'duration': 'General Guide',
+                'views': '1M+'
             },
             {
-                'title': f'📝 {query} Notes & derivation',
-                'link': 'https://www.google.com/search?q=' + query.replace(" ", "+") + "+notes+pdf",
-                'thumbnail': 'https://img.youtube.com/vi/ASwYi-N7Xyw/hqdefault.jpg',
-                'channel': 'Study Materials',
-                'duration': 'PDFs',
+                'title': f'Top 10 Questions for {query}',
+                'link': 'https://www.youtube.com/results?search_query=' + query.replace(" ", "+"),
+                'thumbnail': 'https://via.placeholder.com/320x180.png?text=Explore+More+Videos',
+                'channel': 'YouTube Search',
+                'duration': 'Click to Search',
                 'views': '-'
             }
         ]
