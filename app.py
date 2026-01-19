@@ -188,6 +188,23 @@ st.markdown("""
     div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] p {
         color: #f1f5f9 !important;
     }
+
+    /* HIDE STREAMLIT BRANDING & GITHUB ICON essentially */
+    .stDeployButton {
+        display: none !important;
+    }
+    div[data-testid="stStatusWidget"] {
+        display: none !important;
+    }
+    #MainMenu {
+        visibility: hidden;
+    }
+    header {
+        visibility: hidden;
+    }
+    footer {
+        visibility: hidden;
+    }
 </style>
 """, unsafe_allow_html=True)
 
