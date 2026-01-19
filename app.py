@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from data import get_chapters_by_subject, ALL_CHAPTERS
-from utils import search_videos, generate_questions, get_pyqs, get_random_motivation
+from utils import search_videos, generate_questions, get_pyqs, get_random_motivation, get_flashcards
 from pdf_generator import generate_pyq_pdf
 
 # Page Config
@@ -225,6 +225,37 @@ with st.sidebar:
     
     st.divider()
     
+    # ⏱️ POMODORO TIMER (Sidebar Widget)
+    st.markdown("### ⏱️ Focus Timer")
+    # Session State for Timer
+    if 'pomodoro_active' not in st.session_state:
+        st.session_state.pomodoro_active = False
+        st.session_state.pomodoro_start_time = 0
+        st.session_state.pomodoro_duration = 25 * 60 # 25 mins
+
+    col_p1, col_p2 = st.columns([1,1])
+    with col_p1:
+        focus_time = st.number_input("Mins", min_value=1, max_value=120, value=25, step=5, label_visibility="collapsed")
+    with col_p2:
+        if st.button("Start 🚀", key="start_pomo", use_container_width=True):
+             st.session_state.pomodoro_active = True
+             st.session_state.pomodoro_end_time = time.time() + (focus_time * 60)
+             st.rerun()
+
+    if st.session_state.get('pomodoro_active'):
+        remaining = st.session_state.pomodoro_end_time - time.time()
+        if remaining > 0:
+            mins, secs = divmod(int(remaining), 60)
+            st.metric("Focusing...", f"{mins:02}:{secs:02}")
+            time.sleep(1) # Simple blocking wait for demo, normally use JS or efficient updates
+            st.rerun()
+        else:
+             st.session_state.pomodoro_active = False
+             st.balloons()
+             st.success("Session Complete! Take a break. ☕")
+
+    st.divider()
+    
     # Simple, Indentation-Safe Disclaimer (Moved)
     st.markdown('<p style="color: #fbbf24; font-weight: 600; font-size: 0.9rem; margin-bottom: 20px; margin-top: -15px;">⚠️ for CBSE Board (others soon!)</p>', unsafe_allow_html=True)
 
@@ -296,7 +327,71 @@ if selected_chapter_name != "Select a Chapter...":
     st.caption(f"Class {class_num} • {subject}")
     
     # Tabs for Organization
-    tab1, tab2, tab3 = st.tabs(["📺 Videos", "📝 Q&A & Papers", "🤖 AI Tutor"])
+    tab1, tab_rev, tab2, tab3 = st.tabs(["📺 Videos", "⚡ Revision", "📝 Q&A & Papers", "🤖 AI Tutor"])
+    
+    with tab_rev:
+        st.subheader(f"⚡ Flashcards: {selected_chapter_name}")
+        
+        if "flashcard_idx" not in st.session_state:
+            st.session_state.flashcard_idx = 0
+        if "flashcard_flipped" not in st.session_state:
+            st.session_state.flashcard_flipped = False
+            
+        fc_data = get_flashcards(selected_chapter_name)
+        current_card = fc_data[st.session_state.flashcard_idx]
+        
+        # Card Container
+        card_height = 300
+        
+        col_c1, col_c2, col_c3 = st.columns([1, 4, 1])
+        with col_c2:
+            # Card Styling
+            st.markdown(f"""
+            <div style="
+                background-color: #1e293b;
+                border: 2px solid #3b82f6;
+                border-radius: 16px;
+                height: {card_height}px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                text-align: center;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+                cursor: pointer;
+            ">
+                <div style="font-size: 1.2rem; color: #94a3b8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
+                    { 'DEFINITION' if st.session_state.flashcard_flipped else 'TERM' }
+                </div>
+                <div style="font-size: 2rem; font-weight: 800; color: #f8fafc;">
+                    { current_card['definition'] if st.session_state.flashcard_flipped else current_card['term'] }
+                </div>
+                <div style="margin-top: 20px; font-size: 0.9rem; color: #64748b;">
+                    (Tap 'Flip' to reveal)
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Controls
+            c1, c2, c3 = st.columns([1, 2, 1])
+            with c1:
+                if st.button("⬅️ Prev", use_container_width=True):
+                    st.session_state.flashcard_idx = (st.session_state.flashcard_idx - 1) % len(fc_data)
+                    st.session_state.flashcard_flipped = False
+                    st.rerun()
+            with c2:
+                if st.button("🔄 Flip Card", type="primary", use_container_width=True):
+                    st.session_state.flashcard_flipped = not st.session_state.flashcard_flipped
+                    st.rerun()
+            with c3:
+                if st.button("Next ➡️", use_container_width=True):
+                    st.session_state.flashcard_idx = (st.session_state.flashcard_idx + 1) % len(fc_data)
+                    st.session_state.flashcard_flipped = False
+                    st.rerun()
+            
+            st.markdown(f"<div style='text-align:center; color:#64748b; margin-top:10px;'>Card {st.session_state.flashcard_idx + 1} of {len(fc_data)}</div>", unsafe_allow_html=True)
     
     with tab1:
         st.subheader("Recommended Videos")
