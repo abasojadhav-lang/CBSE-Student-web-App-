@@ -94,20 +94,34 @@ st.markdown("""
         border-right: 1px solid #1e293b;
     }
     
-    /* 7. Scrollbar */
+    /* 7. Hide Main Scrollbar */
     ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+        width: 0px;
+        height: 0px;
     }
+    
     ::-webkit-scrollbar-track {
-        background: #0f172a; 
+        background: transparent;
     }
+    
     ::-webkit-scrollbar-thumb {
-        background: #334155; 
-        border-radius: 4px;
+        background: transparent;
     }
-    ::-webkit-scrollbar-thumb:hover {
-        background: #475569; 
+    
+    /* Hide scrollbar for Firefox */
+    * {
+        scrollbar-width: none;
+    }
+    
+    /* 8. Reduce Container Heights */
+    .element-container {
+        max-height: 600px;
+    }
+    
+    /* Audio player sizing */
+    audio {
+        max-width: 300px;
+        height: 40px;
     }
     
     /* Remove default top margin of standard headers */
