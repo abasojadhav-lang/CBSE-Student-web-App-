@@ -26,10 +26,24 @@ st.set_page_config(
 # Custom CSS for Premium Look
 st.markdown("""
 <style>
-    /* 1. Global Spacing & Background */
+    /* 1. Global Spacing & Background - ULTRA COMPACT */
     div.block-container {
-        padding-top: 2rem !important; /* Reduce top padding */
-        padding-bottom: 2rem !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        max-height: 100vh !important;
+    }
+    
+    /* Reduce all section spacing */
+    .element-container {
+        margin-bottom: 0.2rem !important;
+    }
+    
+    /* Compact dividers */
+    hr {
+        margin-top: 0.3rem !important;
+        margin-bottom: 0.3rem !important;
     }
     
     /* 2. Typography */
@@ -39,27 +53,27 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
     
-    /* 3. Main Title Styling */
+    /* 3. Main Title Styling - COMPACT */
     .title-text {
         font-weight: 800;
         background: -webkit-linear-gradient(45deg, #00C9FF, #92FE9D);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 3rem !important;
-        padding-bottom: 0.5rem;
+        font-size: 1.8rem !important;
+        padding-bottom: 0;
         margin: 0;
+        line-height: 1.2;
     }
     
     .subtitle-text {
-        font-size: 1.5rem !important;
-        font-weight: 700 !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
         background: -webkit-linear-gradient(90deg, #4ade80, #38bdf8);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-top: -5px;
-        margin-bottom: 20px;
-        letter-spacing: 1px;
-        text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+        margin-bottom: 5px;
+        letter-spacing: 0.5px;
     }
     
     /* 4. Professional Buttons */
