@@ -175,15 +175,21 @@ MATHEMATICS_CLASS_12: List[Chapter] = [
     {"id": "m12-13", "name": "Probability", "class": 12, "subject": "Mathematics"},
 ]
 
+from data_maha import MAHA_ALL_CHAPTERS
+
 ALL_CHAPTERS: List[Chapter] = (
     PHYSICS_CLASS_11 + PHYSICS_CLASS_12 +
     CHEMISTRY_CLASS_11 + CHEMISTRY_CLASS_12 +
     BIOLOGY_CLASS_11 + BIOLOGY_CLASS_12 +
-    MATHEMATICS_CLASS_11 + MATHEMATICS_CLASS_12
+    MATHEMATICS_CLASS_11 + MATHEMATICS_CLASS_12 +
+    MAHA_ALL_CHAPTERS
 )
 
-def get_chapters_by_subject(subject: str, class_num: Optional[int] = None) -> List[Chapter]:
+def get_chapters_by_subject(subject: str, class_num: Optional[int] = None, board: str = "CBSE") -> List[Chapter]:
+    # Default board for existing chapters is CBSE if not specified
     return [
         ch for ch in ALL_CHAPTERS
-        if ch["subject"] == subject and (class_num is None or ch["class"] == class_num)
+        if ch["subject"] == subject 
+        and (class_num is None or ch["class"] == class_num)
+        and (ch.get("board", "CBSE") == board)
     ]
