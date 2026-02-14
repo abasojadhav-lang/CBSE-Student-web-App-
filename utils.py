@@ -1,6 +1,66 @@
 from youtubesearchpython import VideosSearch
 import random
 import time
+import os
+import pypdf
+from gtts import gTTS
+
+def generate_welcome_speech():
+    """Generates a welcome mp3 if it doesn't exist."""
+    if not os.path.exists("welcome_speech.mp3"):
+        text = "Welcome to Learnixis! Believe in yourself. Every expert was once a beginner. The path of learning Physics is not just about equations, but about understanding the universe. Take a deep breath, focus, and let's conquer this chapter together. You have the potential to achieve greatness. Let's start!"
+        tts = gTTS(text=text, lang='en')
+        tts.save("welcome_speech.mp3")
+    return "welcome_speech.mp3"
+
+def extract_text_from_pdf(pdf_path, query=None):
+    """
+    Extracts text from a PDF file. 
+    If query is provided, returns paragraphs containing the query/keywords.
+    """
+    try:
+        reader = pypdf.PdfReader(pdf_path)
+        full_text = ""
+        for page in reader.pages:
+            full_text += page.extract_text() + "\n"
+            
+        if not query:
+            return full_text
+            
+        # simple keyword search
+        paragraphs = full_text.split('\n\n') 
+        if len(paragraphs) == 1: # if splitting by double newline fails
+             paragraphs = full_text.split('\n')
+             
+        relevant_text = []
+        query_words = query.lower().split()
+        
+        for para in paragraphs:
+            if any(word in para.lower() for word in query_words if len(word) > 4):
+                relevant_text.append(para.strip())
+                
+        return "\n\n".join(relevant_text[:3]) # Limit to top 3 chunks
+        
+    except Exception as e:
+        return f"Error reading book: {e}"
+
+def get_book_context(query):
+    """
+    Scans the 'books/' directory and finds relevant context for the query.
+    Returns: (Book Name, Excerpt) or None
+    """
+    books_dir = "books"
+    if not os.path.exists(books_dir):
+        return None
+        
+    for filename in os.listdir(books_dir):
+        if filename.endswith(".pdf"):
+            path = os.path.join(books_dir, filename)
+            text = extract_text_from_pdf(path, query)
+            if text and len(text) > 20: # Ensure meaningful content
+                return {"book": filename, "content": text}
+                
+    return None
 
 def parse_duration_to_minutes(duration_str: str) -> float:
     """Parses 'MM:SS' or 'HH:MM:SS' into minutes."""
@@ -81,41 +141,35 @@ def search_videos(query: str, subject: str = "Physics"):
                 })
     except Exception as e:
         print(f"Dynamic search failed: {e}")
-    
-    # 3. Ultimate Fallback (Ensure user sees SOMETHING PLAYABLE & RELEVANT)
-    if not videos:
-        # Instead of showing the SAME videos for every chapter, we generate 
-        # SMART SEARCH CARDS that link to the specific topic query.
+
+    return videos
+
+def get_featured_video(chapter, subject, class_num):
+    """
+    Fetches a SINGLE featured video specifically for CBSE Syllabus.
+    """
+    query = f"{chapter} Class {class_num} {subject} CBSE Syllabus 2025 One Shot"
+    try:
+        search = VideosSearch(query, limit=1)
+        res = search.result()['result']
+        if res:
+            video = res[0]
+            # Add extra metadata
+            return {
+                'id': video.get('id'),
+                'title': video.get('title'),
+                'thumbnail': video.get('thumbnails')[0]['url'] if video.get('thumbnails') else 'https://via.placeholder.com/320x180.png',
+                'link': video.get('link'),
+                'duration': video.get('duration', 'N/A'),
+                'channel': video.get('channel', {}).get('name', 'YouTube'),
+                'views': video.get('viewCount', {}).get('short', 'N/A'),
+                'tag': "CBSE 2025 FOCUS"
+            }
+    except Exception as e:
+        print(f"Error fetching featured video: {e}")
+        return None
+    return None
         
-        # Link 1: YouTube Search for "One Shot"
-        videos.append({
-            'title': f'▶️ Watch "{query}" One Shot',
-            'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+class+12+one+shot',
-            'thumbnail': 'https://i.ytimg.com/vi/ASwYi-N7Xyw/hqdefault.jpg', # Verified Safe Thumb (Classroom)
-            'channel': 'Click to Select Video',
-            'duration': 'Full Chapter',
-            'views': 'Search Results'
-        })
-        
-        # Link 2: Verified Playlist/Notes Search
-        videos.append({
-            'title': f'📚 {query} - Important Derivations',
-            'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+derivations',
-            'thumbnail': 'https://i.ytimg.com/vi/0j5_ZwZ1z8M/hqdefault.jpg', # Verified Safe Thumb (Board Work)
-            'channel': 'Search Topic',
-            'duration': 'Topic Wise',
-            'views': 'Search Results'
-        })
-        
-        # Link 3: Solved Examples
-        videos.append({
-            'title': f'📝 {query} - Solved Problems',
-            'link': f'https://www.youtube.com/results?search_query={query.replace(" ", "+")}+numericals',
-            'thumbnail': 'https://i.ytimg.com/vi/9_C8f_B8C8A/hqdefault.jpg', # Verified Safe Thumb (Chemistry Board)
-            'channel': 'Practice',
-            'duration': 'Questions',
-            'views': 'Search Results'
-        })
 
     return videos
 
@@ -165,21 +219,21 @@ def generate_questions(topic: str):
     """Generates 50 mock Q&A for a topic using templates."""
     
     templates = [
-        ("What is the fundamental principle of {topic}?", "The principle states that..."),
-        ("Define {topic} and give its SI unit.", "Definition: ... SI Unit: ..."),
-        ("Explain the application of {topic} in daily life.", "It is used in..."),
-        ("Derive the expression for {topic}.", "Derivations steps: 1... 2..."),
-        ("Differentiate between {topic} and its inverse.", "Key differences..."),
-        ("Draw the diagram for {topic}.", "Diagram should include..."),
-        ("What are the limitations of {topic} theory?", "Limitations are..."),
-        ("Solve a numerical based on {topic}.", "Given X, Y... Answer is Z."),
-        ("Why is {topic} considered a vector/scalar?", "Because it has magnitude..."),
-        ("State the laws governing {topic}.", "The laws are..."),
+        ("What is the fundamental principle of {topic}?", "The fundamental principle of {topic} is rooted in the conservation laws of physics. It states that the total energy and momentum of an isolated system remain constant over time. In practical terms, this means that any change in the system's state must be accounted for by an equal and opposite change elsewhere. For example, in thermodynamics, this is observed as the First Law, while in mechanics, it governs collisions and orbital motion."),
+        ("Define {topic} and give its SI unit.", "Definition: {topic} is defined as the measure of physical interaction or property that characterizes the system's state. It is a vector quantity having both magnitude and direction (if applicable). \n\nSI Unit: The standard International System unit is typically derived from basic units like kilograms, meters, and seconds. For instance, if referring to Force, the unit is Newton (N). Accurate unit conversion is essential for solving numerical problems correctly."),
+        ("Explain the application of {topic} in daily life.", "{topic} plays a crucial role in modern technology and daily convenience. One common application is in household electronics, where it governs the efficiency of power consumption. Additionally, it is fundamental to transportation systems, ensuring safety and stability. In medical fields, the principles of {topic} are applied in diagnostic imaging tools like MRI and CT scans."),
+        ("Derive the expression for {topic}.", "Derivation Steps:\n1. Start with the basic governing equation (e.g., F=ma or Conservation of Energy).\n2. Apply the specific boundary conditions relevant to the problem (e.g., initial velocity is zero).\n3. Integrate or differentiate the function with respect to time or position.\n4. Substitute the constants of integration.\n5. The final expression relates the input variables to the resultant output, proving the theoretical model."),
+        ("Differentiate between {topic} and its inverse.", "Primary Differences:\n1. **Nature**: {topic} typically refers to the direct effect, whereas its inverse describes the opposing phenomenon.\n2. **Mathematical Representation**: If {topic} is represented by a function f(x), its inverse is f⁻¹(x). Graphical representations show reflection across the line y=x.\n3. **Physical Context**: In real-world scenarios, {topic} might represent accumulation (integration), while its inverse represents rate of change (differentiation)."),
+        ("Draw the diagram for {topic}.", "To correctly draw the diagram for {topic}:\n1. Begin by setting up a clear coordinate system (X-Y axis).\n2. Label all vectors specifically, indicating direction with arrows.\n3. Highlight the interaction points where forces or fields intersect.\n4. Ensure that the scale is approximate to reality.\n5. A well-labeled diagram is often worth 2-3 marks in board exams and clarifies the solution process significantly."),
+        ("What are the limitations of {topic} theory?", "While {topic} theory is robust, it has specific limitations:\n1. **Scale**: It may fail at quantum (microscopic) or cosmic (macroscopic) scales where classical mechanics doesn't apply.\n2. **Idealization**: The theory often assumes ideal conditions—ignoring friction, air resistance, or energy loss—which don't exist in the real world.\n3. **Complexity**: Complex systems with chaotic behavior may not be solvable using the simplified linear equations of this theory."),
+        ("Solve a numerical based on {topic}.", "Problem Solving Strategy:\n1. **Identify Given Data**: List all known values (u, v, a, t, etc.) and convert them to SI units.\n2. **Select Formula**: Choose the equation that links the unknown variable with the knowns.\n3. **Substitute**: Plug the values into the formula carefully.\n4. **Calculate**: Perform the arithmetic, paying attention to significant figures.\n5. **Result**: The final answer usually reveals the magnitude of the effect. Always verify if the answer makes physical sense."),
+        ("Why is {topic} considered a vector/scalar?", "{topic} is classified based on its dependency on direction. \n- If it is a **Vector**, it is because the direction of action significantly changes the outcome (e.g., Force, Velocity). Vector addition rules (parallelogram law) must be applied.\n- If it is a **Scalar**, it only possesses magnitude (e.g., Mass, Energy) and follows simple algebraic addition. Understanding this distinction is vital for setting up the correct equations."),
+        ("State the laws governing {topic}.", "The laws governing {topic} are experimentally verified statements that describe natural phenomena. \n1. **First Law**: Often typically defines the inertial frame of reference.\n2. **Second Law**: Quantifies the relationship, usually F = dp/dt.\n3. **Third Law**: Describes the interaction symmetry (Action-Reaction). \nThese laws are universal within the classical limit and form the foundation of Newtonian physics."),
     ]
     
     variations = [
-        "in modern physics", "at high temperatures", "in a vacuum", "under standard conditions",
-        "conceptually", "mathematically", "historically", "experimentally"
+        "in the context of modern physics", "considering thermodynamic systems", "under ideal laboratory conditions", "when applied to industrial engineering",
+        "conceptually for board exams", "mathematically derived", "historically developed", "experimentally verified"
     ]
     
     questions = []
