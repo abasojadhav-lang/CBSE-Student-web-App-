@@ -254,10 +254,26 @@ st.markdown("""
 # ======== DEBUG API KEY CHECK (TEMPORARY) ========
 st.write("### 🔍 Debug: Checking API Key Access")
 try:
-    test_api = st.secrets["GEMINI_API_KEY"]
-    st.success(f"✅ Success! API key found in st.secrets. Length: {len(test_api)}")
+    if "GEMINI_API_KEY" in st.secrets:
+        key = st.secrets["GEMINI_API_KEY"]
+        st.success(f"✅ Success! Key found at root level. Length: {len(key)}")
+    else:
+        # Check inside sections
+        found_in_section = None
+        for section in st.secrets:
+            if isinstance(st.secrets[section], dict) and "GEMINI_API_KEY" in st.secrets[section]:
+                found_in_section = section
+                break
+        
+        if found_in_section:
+            st.error(f"⚠️ FOUND KEY BUT IT IS NESTED INSIDE '[{found_in_section}]' SECTION!")
+            st.info("💡 FIX: Move 'GEMINI_API_KEY = ...' to the very TOP of your Secrets, before any [section] headers.")
+        else:
+            st.error("❌ Key NOT found in root or any section. Check spelling.")
+            st.write("Available top-level keys:", list(st.secrets.keys()))
+
 except Exception as e:
-    st.error(f"❌ Failed to access st.secrets: {str(e)}")
+    st.error(f"❌ Error checking secrets: {str(e)}")
 st.divider()
 # ======== END DEBUG ========
 
