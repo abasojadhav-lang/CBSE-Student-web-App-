@@ -1174,7 +1174,12 @@ if selected_chapter_name != "Select a Chapter...":
         with col_chat_main:
             st.markdown("### 💬 Conversation with AI Tutor")
             
-            # Chat history display
+            # Check for API Key
+            if not os.getenv("GEMINI_API_KEY") and "GEMINI_API_KEY" not in st.secrets:
+                st.error("⚠️ **Missing API Key**: Please set `GEMINI_API_KEY` in `.streamlit/secrets.toml` or environment variables.")
+                st.info("You can get a free key from [Google AI Studio](https://aistudio.google.com/).")
+                st.stop()
+
             chat_history = chatbot.get_history()
             
             # Callback to handle submission BEFORE rerun
