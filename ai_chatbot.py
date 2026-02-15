@@ -11,7 +11,7 @@ from typing import List, Dict, Optional
 # Configure Gemini API - Support both local and Streamlit Cloud
 try:
     # First try Streamlit secrets (for cloud deployment)
-    GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", "")
+    GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 except:
     # Fallback to environment variable (for local development)
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")

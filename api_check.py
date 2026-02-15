@@ -6,7 +6,7 @@ def get_api_key():
     """Get API key from Streamlit secrets or environment"""
     try:
         # First try Streamlit secrets (for cloud deployment)
-        return st.secrets.get("GEMINI_API_KEY", "")
+        return st.secrets["GEMINI_API_KEY"]
     except:
         # Fallback to environment variable (for local development)
         return os.getenv("GEMINI_API_KEY", "")
