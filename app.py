@@ -251,6 +251,16 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# ======== DEBUG API KEY CHECK (TEMPORARY) ========
+st.write("### 🔍 Debug: Checking API Key Access")
+try:
+    test_api = st.secrets["GEMINI_API_KEY"]
+    st.success(f"✅ Success! API key found in st.secrets. Length: {len(test_api)}")
+except Exception as e:
+    st.error(f"❌ Failed to access st.secrets: {str(e)}")
+st.divider()
+# ======== END DEBUG ========
+
 # Sidebar
 with st.sidebar:
 
