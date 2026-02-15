@@ -131,3 +131,13 @@ Solve the problem ACCURATELY and FAST.
 def create_chatbot(chapter: str, subject: str, class_num: int) -> ChapterChatbot:
     """Factory function to create a chatbot instance"""
     return ChapterChatbot(chapter, subject, class_num)
+
+def get_chatbot():
+    """Singleton access to the chatbot instance with session state persistence."""
+    if 'chatbot' not in st.session_state:
+        st.session_state.chatbot = ChapterChatbot(
+            st.session_state.get('selected_chapter_name', 'General'), 
+            st.session_state.get('subject', 'General'), 
+            st.session_state.get('class', 'General')
+        )
+    return st.session_state.chatbot

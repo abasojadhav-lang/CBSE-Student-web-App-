@@ -1177,26 +1177,30 @@ if selected_chapter_name != "Select a Chapter...":
             # Chat history display
             chat_history = chatbot.get_history()
             
+            # Callback to handle submission BEFORE rerun
+            def submit_question():
+                if st.session_state.user_question_input:
+                    user_q = st.session_state.user_question_input
+                    # Generate response immediately
+                    chatbot.ask(user_q)
+                    # Clear input
+                    st.session_state.user_question_input = ""
+            
             # Input area - MOVED TO TOP as per user request
             with st.container():
-                with st.form(key="ai_tutor_form", clear_on_submit=True):
-                    col_input, col_btn = st.columns([5, 1])
-                    with col_input:
-                        user_question = st.text_input(
-                            "Ask a question", 
-                            placeholder="Type your question here...",
-                            label_visibility="collapsed"
-                        )
-                    with col_btn:
-                        submit_clicked = st.form_submit_button("📤 Ask", type="primary", use_container_width=True)
-
-            # Logic to handle submission must correspond to the form
-            if submit_clicked and user_question:
-                with st.spinner("Thinking..."):
-                    # Get answer immediately
-                    chatbot.ask(user_question)
-                    # Force reload to show new history
-                    st.rerun()
+                col_input, col_btn = st.columns([5, 1])
+                with col_input:
+                    st.text_input(
+                        "Ask a question", 
+                        placeholder="Type your question here...",
+                        label_visibility="collapsed",
+                        key="user_question_input",
+                        on_change=submit_question
+                    )
+                with col_btn:
+                    if st.button("📤 Ask", type="primary", use_container_width=True):
+                        submit_question()
+                        st.rerun()
 
             # Container for chat messages
             chat_container = st.container(height=500)
