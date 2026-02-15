@@ -1209,48 +1209,31 @@ if selected_chapter_name != "Select a Chapter...":
                 """)
             
             # Input area - always at bottom
-            st.markdown("---")
-            st.markdown("#### Ask Your Question:")
-            
-            user_question = st.text_area(
-                label="Type your question here:",
-                placeholder="e.g., Can you explain Newton's Third Law with an example?",
-                height=100,
-                key="ai_tutor_input",
-                label_visibility="collapsed"
-            )
-            
-            col_ask, col_clear, col_space = st.columns([2, 1, 2])
-            
-            with col_ask:
-                if st.button("📤 Ask AI Tutor", use_container_width=True, type="primary"):
-                    if user_question and user_question.strip():
-                        # Append user question to UI immediately
-                        with chat_container:
-                             with st.chat_message("user", avatar="👤"):
-                                 st.write(user_question)
+            # Input area - using st.chat_input for better experience
+            if prompt := st.chat_input("Type your question here..."):
+                # Append user question to UI immediately
+                with chat_container:
+                     with st.chat_message("user", avatar="👤"):
+                         st.write(prompt)
+                     
+                     # Placeholder for AI response
+                     with st.chat_message("assistant", avatar="🎓"):
+                         message_placeholder = st.empty()
+                         full_response = ""
+                         
+                         # Stream response
+                         try:
+                             # Initial Loading state
+                             message_placeholder.write("Thinking...")
                              
-                             # Placeholder for AI response
-                             with st.chat_message("assistant", avatar="🎓"):
-                                 message_placeholder = st.empty()
-                                 full_response = ""
-                                 
-                                 # Stream response
-                                 try:
-                                     # Initial Loading state
-                                     message_placeholder.write("Thinking...")
-                                     
-                                     for chunk in chatbot.ask_stream(user_question):
-                                         full_response += chunk
-                                         # Update placeholder with accumulated text
-                                         message_placeholder.markdown(full_response)
-                                     
-                                     st.rerun()
-                                 except Exception as e:
-                                     st.error(f"❌ Error: {str(e)}")
-
-                    else:
-                        st.warning("Please enter a question!")
+                             for chunk in chatbot.ask_stream(prompt):
+                                 full_response += chunk
+                                 # Update placeholder with accumulated text
+                                 message_placeholder.markdown(full_response)
+                             
+                             st.rerun()
+                         except Exception as e:
+                             st.error(f"❌ Error: {str(e)}")
             
             with col_clear:
                 if st.button("🗑️ Clear Chat", use_container_width=True):
