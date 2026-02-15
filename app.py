@@ -1177,29 +1177,26 @@ if selected_chapter_name != "Select a Chapter...":
             # Chat history display
             chat_history = chatbot.get_history()
             
-            # Helper to handle question submission
-            def handle_question():
-                if st.session_state.ai_user_question:
-                    user_q = st.session_state.ai_user_question
-                    # Generate response immediately
-                    chatbot.ask(user_q) # Use non-streaming for reliability in this layout
-                    st.session_state.ai_user_question = "" # Clear input
-            
             # Input area - MOVED TO TOP as per user request
             with st.container():
-                col_input, col_btn = st.columns([5, 1])
-                with col_input:
-                    st.text_input(
-                        "Ask a question", 
-                        placeholder="Type your question here...",
-                        label_visibility="collapsed",
-                        key="ai_user_question",
-                        on_change=handle_question
-                    )
-                with col_btn:
-                    if st.button("📤 Ask", type="primary", use_container_width=True):
-                        handle_question()
-                        st.rerun()
+                with st.form(key="ai_tutor_form", clear_on_submit=True):
+                    col_input, col_btn = st.columns([5, 1])
+                    with col_input:
+                        user_question = st.text_input(
+                            "Ask a question", 
+                            placeholder="Type your question here...",
+                            label_visibility="collapsed"
+                        )
+                    with col_btn:
+                        submit_clicked = st.form_submit_button("📤 Ask", type="primary", use_container_width=True)
+
+            # Logic to handle submission must correspond to the form
+            if submit_clicked and user_question:
+                with st.spinner("Thinking..."):
+                    # Get answer immediately
+                    chatbot.ask(user_question)
+                    # Force reload to show new history
+                    st.rerun()
 
             # Container for chat messages
             chat_container = st.container(height=500)
