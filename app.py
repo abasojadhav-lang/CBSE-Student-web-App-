@@ -1175,6 +1175,8 @@ if selected_chapter_name != "Select a Chapter...":
             st.markdown("### 💬 Conversation with AI Tutor")
             
             # Chat history display
+            chat_history = chatbot.get_history()
+            
             # Input area - MOVED TO TOP as per user request
             with st.container():
                 with st.form(key="ai_tutor_form", clear_on_submit=True):
