@@ -269,6 +269,11 @@ with st.sidebar:
     
     st.divider()
     
+    # Show API connection status
+    show_api_status_sidebar()
+    
+    st.divider()
+    
     
     # Board Selection
     board = st.selectbox(
