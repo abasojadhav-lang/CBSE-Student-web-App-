@@ -71,7 +71,10 @@ Solve the problem ACCURATELY and FAST.
             self.chat_history.append({'question': question, 'answer': answer})
             return answer
         except Exception as e:
-            return f"⚠️ Error: {str(e)}"
+            error_msg = f"⚠️ Error: {str(e)}"
+            self.chat_history.append({'question': question, 'answer': error_msg})
+            return error_msg
+
 
     def ask_stream(self, question: str):
         """
