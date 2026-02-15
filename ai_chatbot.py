@@ -61,49 +61,59 @@ Stay focused on "{chapter}" - if asked about other chapters, gently redirect to 
     
     def ask(self, question: str) -> str:
         """
-        Ask a question to the AI tutor
-        
-        Args:
-            question: Student's question
-        
-        Returns:
-            AI tutor's response
+        Ask a question to the AI tutor (Non-streaming)
         """
         if not self.model:
-            return ("⚠️ AI Chat requires GEMINI_API_KEY to be set. "
-                   "Please configure your API key to use this feature.\n\n"
-                   "Get your free API key at: https://makersuite.google.com/app/apikey")
+            return "⚠️ AI Chat requires GEMINI_API_KEY to be set. Please configure your API key."
         
         try:
-            # Build conversation prompt
-            conversation = f"{self.system_context}\n\n"
-            
-            # Add chat history
-            for msg in self.chat_history[-5:]:  # Last 5 exchanges for context
-                conversation += f"Student: {msg['question']}\n"
-                conversation += f"Tutor: {msg['answer']}\n\n"
-            
-            # Add current question
-            conversation += f"Student: {question}\nTutor: "
+            # Build conversation (same as before)
+            conversation = self._build_prompt(question)
             
             # Generate response
             response = self.model.generate_content(conversation)
             answer = response.text.strip()
             
             # Save to history
-            self.chat_history.append({
-                'question': question,
-                'answer': answer
-            })
-            
+            self.chat_history.append({'question': question, 'answer': answer})
             return answer
-        
         except Exception as e:
-            error_msg = f"Error: {str(e)}"
-            if "API_KEY" in str(e).upper():
-                return ("⚠️ API key error. Please check that your GEMINI_API_KEY is valid.\n\n"
-                       "Get a free key at: https://makersuite.google.com/app/apikey")
-            return f"⚠️ Sorry, I encountered an error: {error_msg}\n\nPlease try rephrasing your question."
+            return f"⚠️ Error: {str(e)}"
+
+    def ask_stream(self, question: str):
+        """
+        Ask a question and stream the response
+        Yields chunks of text as they are generated
+        """
+        if not self.model:
+            yield "⚠️ AI Chat requires GEMINI_API_KEY to be set."
+            return
+
+        try:
+            conversation = self._build_prompt(question)
+            response = self.model.generate_content(conversation, stream=True)
+            
+            full_response = ""
+            for chunk in response:
+                if chunk.text:
+                    text_chunk = chunk.text
+                    full_response += text_chunk
+                    yield text_chunk
+            
+            # Save to history after complete
+            self.chat_history.append({'question': question, 'answer': full_response})
+            
+        except Exception as e:
+            yield f"⚠️ Error: {str(e)}"
+
+    def _build_prompt(self, question: str) -> str:
+        """Helper to build the conversation prompt"""
+        prompt = f"{self.system_context}\n\n"
+        for msg in self.chat_history[-5:]:
+            prompt += f"Student: {msg['question']}\n"
+            prompt += f"Tutor: {msg['answer']}\n\n"
+        prompt += f"Student: {question}\nTutor: "
+        return prompt
     
     def get_suggested_questions(self) -> List[str]:
         """Get suggested starter questions for this chapter"""

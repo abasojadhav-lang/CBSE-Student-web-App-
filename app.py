@@ -248,34 +248,7 @@ st.markdown("""
     footer {
         visibility: hidden;
     }
-</style>
 """, unsafe_allow_html=True)
-
-# ======== DEBUG API KEY CHECK (TEMPORARY) ========
-st.write("### 🔍 Debug: Checking API Key Access")
-try:
-    if "GEMINI_API_KEY" in st.secrets:
-        key = st.secrets["GEMINI_API_KEY"]
-        st.success(f"✅ Success! Key found at root level. Length: {len(key)}")
-    else:
-        # Check inside sections
-        found_in_section = None
-        for section in st.secrets:
-            if isinstance(st.secrets[section], dict) and "GEMINI_API_KEY" in st.secrets[section]:
-                found_in_section = section
-                break
-        
-        if found_in_section:
-            st.error(f"⚠️ FOUND KEY BUT IT IS NESTED INSIDE '[{found_in_section}]' SECTION!")
-            st.info("💡 FIX: Move 'GEMINI_API_KEY = ...' to the very TOP of your Secrets, before any [section] headers.")
-        else:
-            st.error("❌ Key NOT found in root or any section. Check spelling.")
-            st.write("Available top-level keys:", list(st.secrets.keys()))
-
-except Exception as e:
-    st.error(f"❌ Error checking secrets: {str(e)}")
-st.divider()
-# ======== END DEBUG ========
 
 # Sidebar
 with st.sidebar:
@@ -1268,18 +1241,57 @@ if selected_chapter_name != "Select a Chapter...":
             with col_ask:
                 if st.button("📤 Ask AI Tutor", use_container_width=True, type="primary"):
                     if user_question and user_question.strip():
-                        try:
-                            with st.spinner("🤔 AI Tutor is thinking..."):
-                                answer = chatbot.ask(user_question)
-                            
-                            # Check if answer contains error
-                            if answer.startswith("⚠️"):
-                                st.error(answer)
-                            else:
-                                st.toast("✅ Answer ready! Check the conversation above.", icon="🎓")
-                                st.rerun()
-                        except Exception as e:
-                            st.error(f"❌ Error asking AI: {str(e)}")
+                        # Append user question to UI immediately
+                        with chat_container:
+                             st.markdown(f"""
+                                <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
+                                            padding: 15px; 
+                                            border-radius: 15px 15px 5px 15px; 
+                                            margin: 10px 0; 
+                                            margin-left: 20%;
+                                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                    <strong style="color: #60a5fa;">🙋 You:</strong><br>
+                                    <span style="color: #e0e7ff; font-size: 1.05em;">{user_question}</span>
+                                </div>
+                                """, unsafe_allow_html=True)
+                             
+                             # Placeholder for AI response
+                             message_placeholder = st.empty()
+                             full_response = ""
+                             
+                             # Stream response
+                             try:
+                                 # Initial Loading state
+                                 message_placeholder.markdown("""
+                                    <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
+                                                padding: 15px; 
+                                                border-radius: 15px 15px 15px 5px; 
+                                                margin: 10px 0; 
+                                                margin-right: 20%;
+                                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                        <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
+                                        <span style="color: #d1fae5;">Thinking...</span>
+                                    </div>""", unsafe_allow_html=True)
+                                 
+                                 for chunk in chatbot.ask_stream(user_question):
+                                     full_response += chunk
+                                     # Update placeholder with accumulated text
+                                     message_placeholder.markdown(f"""
+                                        <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
+                                                    padding: 15px; 
+                                                    border-radius: 15px 15px 15px 5px; 
+                                                    margin: 10px 0; 
+                                                    margin-right: 20%;
+                                                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                            <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
+                                            <span style="color: #d1fae5; font-size: 1.05em; line-height: 1.6;">{full_response.replace(chr(10), '<br>')}</span>
+                                        </div>
+                                        """, unsafe_allow_html=True)
+                                 
+                                 st.rerun()
+                             except Exception as e:
+                                 st.error(f"❌ Error: {str(e)}")
+
                     else:
                         st.warning("Please enter a question!")
             
@@ -1301,18 +1313,53 @@ if selected_chapter_name != "Select a Chapter...":
                     use_container_width=True,
                     help="Click to ask this question"
                 ):
-                    try:
-                        with st.spinner("🤔 AI Tutor is thinking..."):
-                            answer = chatbot.ask(suggestion)
-                        
-                        # Check if answer is an error
-                        if answer.startswith("⚠️"):
-                            st.error(answer)
-                        else:
-                            st.toast("✅ Question answered! Check the conversation above.", icon="🎓")
-                            st.rerun()
-                    except Exception as e:
-                        st.error(f"❌ Error: {str(e)}")
+                    # Append user question to UI
+                    with chat_container:
+                         st.markdown(f"""
+                            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
+                                        padding: 15px; 
+                                        border-radius: 15px 15px 5px 15px; 
+                                        margin: 10px 0; 
+                                        margin-left: 20%;
+                                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                <strong style="color: #60a5fa;">🙋 You:</strong><br>
+                                <span style="color: #e0e7ff; font-size: 1.05em;">{suggestion}</span>
+                            </div>
+                            """, unsafe_allow_html=True)
+                         
+                         message_placeholder = st.empty()
+                         full_response = ""
+                         
+                         try:
+                             # Initial Loading state
+                             message_placeholder.markdown("""
+                                <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
+                                            padding: 15px; 
+                                            border-radius: 15px 15px 15px 5px; 
+                                            margin: 10px 0; 
+                                            margin-right: 20%;
+                                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                    <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
+                                    <span style="color: #d1fae5;">Thinking...</span>
+                                </div>""", unsafe_allow_html=True)
+                             
+                             for chunk in chatbot.ask_stream(suggestion):
+                                 full_response += chunk
+                                 message_placeholder.markdown(f"""
+                                    <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
+                                                padding: 15px; 
+                                                border-radius: 15px 15px 15px 5px; 
+                                                margin: 10px 0; 
+                                                margin-right: 20%;
+                                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                                        <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
+                                        <span style="color: #d1fae5; font-size: 1.05em; line-height: 1.6;">{full_response.replace(chr(10), '<br>')}</span>
+                                    </div>
+                                    """, unsafe_allow_html=True)
+                             
+                             st.rerun()
+                         except Exception as e:
+                             st.error(f"❌ Error: {str(e)}")
             
             st.divider()
             
