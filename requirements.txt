@@ -1,5 +1,6 @@
 streamlit>=1.31.0
 google-generativeai>=0.3.2
+google-genai>=1.63.0
 pandas>=2.1.4
 fpdf2>=2.7.8
 Pillow>=10.2.0

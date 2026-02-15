@@ -6,10 +6,19 @@ import base64
 from data import get_chapters_by_subject, ALL_CHAPTERS
 from utils import search_videos, generate_questions, get_pyqs, get_random_motivation, get_flashcards, get_book_context, generate_welcome_speech, get_featured_video
 from pdf_generator import generate_pyq_pdf, generate_chapter_notes
-from download_books import download_ncert_books
+from ncert_downloader_enhanced import download_all_ncert_books, download_by_chapter_list
 from problem_manager import add_problem, get_all_problems, get_problems_by_status, get_problems_by_subject_chapter, add_teacher_response
 from mcq_generator import get_chapter_mcqs, get_mock_test_mcqs, save_test_result, get_recent_results
 from progress_tracker import get_progress, update_test_performance, get_weak_chapters, get_overall_stats, add_time_spent
+from notebook_llm_features import (
+    generate_multi_format_questions, 
+    generate_chapter_summary_audio, 
+    generate_podcast_conversation,
+    generate_study_guide,
+    extract_qa_from_document
+)
+from ai_chatbot import create_chatbot
+from api_check import show_api_setup_warning, show_api_status_sidebar
 
 # Page Config
 st.set_page_config(
@@ -417,14 +426,14 @@ if selected_chapter_name != "Select a Chapter...":
     st.caption(f"Class {class_num} • {subject}")
     
     # Tabs for Organization
-    tab1, tab_rev, tab2, tab_qbank, tab_practice, tab_progress, tab_ps, tab4 = st.tabs([
+    tab1, tab_rev, tab2, tab_practice, tab_progress, tab_ps, tab_ai, tab4 = st.tabs([
         "📺 Videos", 
         "⚡ Revision", 
-        "📝 Q&A", 
-        "❓ Questions", 
-        "🎯 Practice",
-        "📊 Progress",
-        "🧑‍🏫 Solving",
+        "📋 Q&A",
+        "🎯 Practice", 
+        "📊 Progress", 
+        "🧩 Solving",
+        "🤖 AI Study Tools", 
         "📚 Books"
     ])
 
@@ -658,73 +667,13 @@ if selected_chapter_name != "Select a Chapter...":
             else:
                  st.info("Previous Year Board Papers are available for Class 12 CBSE & Class 10 Maharashtra.")
 
-    with tab_qbank:
-        st.subheader(f"❓ Question Bank: {subject}")
-        
-        # Map Subject to File
-        qb_mapping = {
-            "Math 1 (Algebra)": "Maths_Question_Bank.md",
-            "Math 2 (Geometry)": "Maths_Question_Bank.md",
-            "Science 1": "Science_Question_Bank.md",
-            "Science 2": "Science_Question_Bank.md",
-            "History": "History_Question_Bank.md",
-            "Geography": "Geography_Question_Bank.md"
-        }
-        
-        target_file = qb_mapping.get(subject)
-        
-        if target_file:
-            file_path = os.path.join("question_bank", target_file)
-            if os.path.exists(file_path):
-                # Read Content
-                with open(file_path, "r", encoding="utf-8") as f:
-                    file_content = f.read()
-                
-                col_qb1, col_qb2 = st.columns([1, 1])
-                
-                with col_qb1:
-                    # Original MD Download
-                    st.download_button(
-                        label=f"⬇️ Download as Markdown",
-                        data=file_content,
-                        file_name=target_file,
-                        mime="text/markdown",
-                        use_container_width=True
-                    )
-                
-                with col_qb2:
-                    # PDF Download Logic
-                    from pdf_generator import generate_markdown_to_pdf
-                    
-                    # Detect if it needs Marathi font
-                    is_marathi = "History" in subject or "Geography" in subject
-                    
-                    if st.button("📄 Generate & Download PDF", key=f"gen_pdf_{target_file}", use_container_width=True):
-                        with st.spinner("Generating PDF..."):
-                            pdf_path = generate_markdown_to_pdf(file_content, target_file, is_marathi)
-                            
-                        # Serve the generated PDF
-                        with open(pdf_path, "rb") as pdf_file:
-                             st.download_button(
-                                label="⬇️ Click to Save PDF",
-                                data=pdf_file,
-                                file_name=target_file.replace(".md", ".pdf"),
-                                mime="application/pdf",
-                                key=f"save_pdf_{target_file}"
-                            )
-                
-                # Display Content
-                st.markdown("---")
-                st.markdown(file_content)
-            else:
-                st.warning(f"Question Bank file '{target_file}' not found. Please generate it first.")
-        else:
-             st.info(f"No specific Question Bank generated for '{subject}' yet.")
 
-    # AI Tutor tab removed - was not functioning properly
-
+    # Practice Mode Tab
     with tab_practice:
         st.subheader("🎯 Practice Mode - Test Your Knowledge")
+        
+        # Show API warning if needed
+        api_available = show_api_setup_warning()
         
         # Test type selection
         test_type = st.radio("Select Test Type", 
@@ -763,13 +712,35 @@ if selected_chapter_name != "Select a Chapter...":
             
             with col_start:
                 if st.button("🚀 Start Test", type="primary", use_container_width=True):
-                    # Load questions
-                    if test_type == "📚 Chapter Test (10 Q)":
-                        questions = get_chapter_mcqs(subject, selected_chapter_name, 10)
-                    elif test_type == "⏰ Mock Test (30 Q)":
-                        questions = get_mock_test_mcqs(subject, 30)
-                    else:
-                        questions = get_mock_test_mcqs(subject, 50)
+                    # Generate AI questions for the test
+                    with st.spinner("🤖 Generating test questions using AI..."):
+                        if test_type == "📚 Chapter Test (10 Q)":
+                            # Generate chapter-specific questions
+                            questions = generate_multi_format_questions(
+                                selected_chapter_name,
+                                subject,
+                                ["MCQ"],  # Only MCQs for practice test
+                                count=10,
+                                difficulty="Medium"
+                            )
+                        elif test_type == "⏰ Mock Test (30 Q)":
+                            # Mixed difficulty for mock test
+                            questions = generate_multi_format_questions(
+                                selected_chapter_name,
+                                subject,
+                                ["MCQ"],
+                                count=30,
+                                difficulty=None  # Mix of all difficulties
+                            )
+                        else:
+                            # Full syllabus - harder questions
+                            questions = generate_multi_format_questions(
+                                selected_chapter_name,
+                                subject,
+                                ["MCQ"],
+                                count=50,
+                                difficulty="Hard"
+                            )
                     
                     if questions:
                         st.session_state.test_questions = questions
@@ -779,7 +750,7 @@ if selected_chapter_name != "Select a Chapter...":
                         st.session_state.current_test_type = test_type
                         st.rerun()
                     else:
-                        st.error("No questions available for this test. Try another chapter.")
+                        st.error("Failed to generate questions. Please check your internet connection.")
             
             with col_recent:
                 # Show recent test results
@@ -882,8 +853,6 @@ if selected_chapter_name != "Select a Chapter...":
                     st.session_state.test_active = False
                     st.session_state.test_questions = []
                     st.session_state.test_answers = {}
-                    st.rerun()
-        
         # Show results if just submitted
         if st.session_state.get('show_results'):
             result = st.session_state.test_result
@@ -1171,6 +1140,234 @@ if selected_chapter_name != "Select a Chapter...":
             else:
                 st.info("No problems found matching the selected filters.")
 
+
+    with tab_ai:
+        st.subheader("🎓 AI Tutor - Interactive Learning Session")
+        st.caption("Your personal AI instructor - Ask anything about this chapter!")
+        
+        # Show API warning if needed
+        api_available = show_api_setup_warning()
+        
+        st.divider()
+        
+        # Initialize chatbot in session state
+        chatbot_key = f"chatbot_{subject}_{selected_chapter_name}"
+        if chatbot_key not in st.session_state:
+            st.session_state[chatbot_key] = create_chatbot(selected_chapter_name, subject, class_num)
+            
+        chatbot = st.session_state[chatbot_key]
+        
+        # Debug: Show chatbot status
+        if chatbot.model is None:
+            st.error("⚠️ Chatbot model failed to initialize. Please restart the app.")
+            st.stop()
+        else:
+            st.success("✅ AI Chatbot is ready!", icon="🤖")
+        
+        # Main interactive interface - 2 columns
+        col_chat_main, col_chat_sidebar = st.columns([2, 1])
+        
+        with col_chat_main:
+            st.markdown("### 💬 Conversation with AI Tutor")
+            
+            # Chat history display
+            chat_history = chatbot.get_history()
+            
+            if chat_history:
+                # Display in a clean chat interface
+                chat_container = st.container(height=500)
+                with chat_container:
+                    for idx, exchange in enumerate(chat_history):
+                        # Student question bubble
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
+                                    padding: 15px; 
+                                    border-radius: 15px 15px 5px 15px; 
+                                    margin: 10px 0; 
+                                    margin-left: 20%;
+                                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                            <strong style="color: #60a5fa;">🙋 You:</strong><br>
+                            <span style="color: #e0e7ff; font-size: 1.05em;">{exchange['question']}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # AI answer bubble
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
+                                    padding: 15px; 
+                                    border-radius: 15px 15px 15px 5px; 
+                                    margin: 10px 0; 
+                                    margin-right: 20%;
+                                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+                            <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
+                            <span style="color: #d1fae5; font-size: 1.05em; line-height: 1.6;">{exchange['answer'].replace(chr(10), '<br>')}</span>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        st.markdown("<br>", unsafe_allow_html=True)
+            else:
+                # Welcome message when no chat history
+                st.info(f"""
+                👋 **Welcome to your interactive AI tutor!**
+                
+                I'm here to help you master **{selected_chapter_name}**. Ask me anything:
+                - Explain concepts in simple terms
+                - Solve numerical problems step-by-step  
+                - Clarify doubts from your textbook
+                - Get exam tips and shortcuts
+                - Real-world applications
+                
+                💡 Try the suggested questions on the right to get started!
+                """)
+            
+            # Input area - always at bottom
+            st.markdown("---")
+            st.markdown("#### Ask Your Question:")
+            
+            user_question = st.text_area(
+                label="Type your question here:",
+                placeholder="e.g., Can you explain Newton's Third Law with an example?",
+                height=100,
+                key="ai_tutor_input",
+                label_visibility="collapsed"
+            )
+            
+            col_ask, col_clear, col_space = st.columns([2, 1, 2])
+            
+            with col_ask:
+                if st.button("📤 Ask AI Tutor", use_container_width=True, type="primary"):
+                    if user_question and user_question.strip():
+                        try:
+                            with st.spinner("🤔 AI Tutor is thinking..."):
+                                answer = chatbot.ask(user_question)
+                            
+                            # Check if answer contains error
+                            if answer.startswith("⚠️"):
+                                st.error(answer)
+                            else:
+                                st.toast("✅ Answer ready! Check the conversation above.", icon="🎓")
+                                st.rerun()
+                        except Exception as e:
+                            st.error(f"❌ Error asking AI: {str(e)}")
+                    else:
+                        st.warning("Please enter a question!")
+            
+            with col_clear:
+                if st.button("🗑️ Clear Chat", use_container_width=True):
+                    chatbot.clear_history()
+                    st.rerun()
+        
+        with col_chat_sidebar:
+            st.markdown("### 💡 Quick Start")
+            
+            st.markdown("**Suggested Questions:**")
+            suggested = chatbot.get_suggested_questions()
+            
+            for idx, suggestion in enumerate(suggested):
+                if st.button(
+                    suggestion, 
+                    key=f"suggest_ai_{idx}", 
+                    use_container_width=True,
+                    help="Click to ask this question"
+                ):
+                    try:
+                        with st.spinner("🤔 AI Tutor is thinking..."):
+                            answer = chatbot.ask(suggestion)
+                        
+                        # Check if answer is an error
+                        if answer.startswith("⚠️"):
+                            st.error(answer)
+                        else:
+                            st.toast("✅ Question answered! Check the conversation above.", icon="🎓")
+                            st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+            
+            st.divider()
+            
+            # Study aids section
+            st.markdown("### 📚 Study Aids")
+            
+            # Audio summary
+            with st.expander("🎧 Audio Summary", expanded=False):
+                st.caption("Listen to a 2-3 minute chapter summary")
+                
+                if st.button("🔊 Generate Summary", key="gen_audio_summary_ai", use_container_width=True):
+                    with st.spinner("Generating audio..."):
+                        audio_path = generate_chapter_summary_audio(
+                            selected_chapter_name,
+                            subject,
+                            class_num
+                        )
+                    
+                    if audio_path:
+                        st.session_state['current_audio'] = audio_path
+                        st.rerun()
+                
+                # Play audio if generated
+                if 'current_audio' in st.session_state and st.session_state['current_audio']:
+                    st.audio(st.session_state['current_audio'], format="audio/mp3")
+            
+            # Study guide
+            with st.expander("📖 Study Guide", expanded=False):
+                st.caption("Generate comprehensive notes")
+                
+                guide_template = st.radio(
+                    "Format:",
+                    ["Bullet Points", "Detailed Notes", "Flashcards"],
+                    key="guide_template_ai",
+                    horizontal=False
+                )
+                
+                if st.button("📝 Generate Guide", key="gen_guide_ai", use_container_width=True):
+                    with st.spinner("Creating study guide..."):
+                        template_map = {
+                            "Bullet Points": "bullet_points",
+                            "Detailed Notes": "detailed_notes",
+                            "Flashcards": "flashcard_format"
+                        }
+                        
+                        guide_content = generate_study_guide(
+                            selected_chapter_name,
+                            subject,
+                            class_num,
+                            template_map[guide_template]
+                        )
+                    
+                    st.session_state['study_guide'] = guide_content
+                    st.rerun()
+                
+                # Display guide if generated
+                if 'study_guide' in st.session_state and st.session_state['study_guide']:
+                    st.markdown(st.session_state['study_guide'])
+                    
+                    # Download option
+                    st.download_button(
+                        "⬇️ Download as Markdown",
+                        st.session_state['study_guide'],
+                        file_name=f"{selected_chapter_name}_study_guide.md",
+                        mime="text/markdown",
+                        use_container_width=True
+                    )
+            
+            st.divider()
+            
+            st.markdown("### ✨ Tips")
+            st.markdown("""
+            - **Be specific** in your questions
+            - Ask for **examples**
+            - Request **step-by-step** solutions
+            - Clarify **any doubt** instantly
+            - Get **exam strategies**
+            """)
+
+
+
+
+
+
+
+
     with tab4:
         st.subheader("📚 Digital Library")
         
@@ -1181,10 +1378,20 @@ if selected_chapter_name != "Select a Chapter...":
         with col_lib2:
             if st.button("⬇️ Download All Books", type="secondary", use_container_width=True):
                  with st.status("Downloading NCERT Textbooks...", expanded=True) as status:
-                     st.write("Connecting to NCERT Server...")
-                     logs = download_ncert_books(class_nums=[class_num], subjects=[subject])
-                     for log in logs:
-                         st.write(log)
+                     st.write(f"Fetching chapter-wise PDFs for Class {class_num} {subject}...")
+                     st.write("This may take several minutes...")
+                     
+                     stats = download_all_ncert_books(
+                         classes=[class_num], 
+                         subjects=[subject],
+                         output_dir="books"
+                     )
+                     
+                     st.write(f"✓ Successfully downloaded: {stats['successful']} chapters")
+                     st.write(f"○ Already had: {stats['skipped']} chapters")
+                     if stats['failed'] > 0:
+                         st.write(f"✗ Failed: {stats['failed']} chapters")
+                     
                      status.update(label="Download Complete!", state="complete", expanded=False)
                      st.rerun()
                      

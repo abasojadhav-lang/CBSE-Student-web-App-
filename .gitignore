@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# User-generated data (don't commit user data)
+user_progress.json
+test_results.json
+problems_data.json
+audio_cache.json
+
+# Test files
+test_*.py
+test_*.pdf
+reproduce_*.py
+pdf_debug.log
+list_*.py
+
+# Batch files with API keys (DO NOT COMMIT)
+START_APP.bat
+run_app.bat
+
+# Generated audio files
+welcome_speech.mp3
+audio_summaries/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Large files (books are downloaded at runtime)
+books/*.pdf

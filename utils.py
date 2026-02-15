@@ -6,9 +6,9 @@ import pypdf
 from gtts import gTTS
 
 def generate_welcome_speech():
-    """Generates a welcome mp3 if it doesn't exist."""
+    """Generates a short 5-second welcome mp3 if it doesn't exist."""
     if not os.path.exists("welcome_speech.mp3"):
-        text = "Welcome to Learnixis! Believe in yourself. Every expert was once a beginner. The path of learning Physics is not just about equations, but about understanding the universe. Take a deep breath, focus, and let's conquer this chapter together. You have the potential to achieve greatness. Let's start!"
+        text = "Welcome to Learnixis! Believe in yourself and let's start learning!"
         tts = gTTS(text=text, lang='en')
         tts.save("welcome_speech.mp3")
     return "welcome_speech.mp3"
