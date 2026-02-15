@@ -1177,9 +1177,11 @@ if selected_chapter_name != "Select a Chapter...":
             # Chat history display
             chat_history = chatbot.get_history()
             
+            # Container for chat messages - defined here so it's available for streaming
+            chat_container = st.container(height=500)
+            
             if chat_history:
                 # Display in a clean chat interface
-                chat_container = st.container(height=500)
                 with chat_container:
                     for idx, exchange in enumerate(chat_history):
                         # Student question bubble
