@@ -1175,67 +1175,56 @@ if selected_chapter_name != "Select a Chapter...":
             st.markdown("### 💬 Conversation with AI Tutor")
             
             # Chat history display
-            chat_history = chatbot.get_history()
-            
-            # Container for chat messages - defined here so it's available for streaming
+            # Input area - MOVED TO TOP as per user request
+            with st.container():
+                with st.form(key="ai_tutor_form", clear_on_submit=True):
+                    col_input, col_btn = st.columns([5, 1])
+                    with col_input:
+                        user_question = st.text_input(
+                            "Ask a question", 
+                            placeholder="Type your question here...",
+                            label_visibility="collapsed"
+                        )
+                    with col_btn:
+                        submit_clicked = st.form_submit_button("📤 Ask", type="primary", use_container_width=True)
+
+            # Container for chat messages
             chat_container = st.container(height=500)
             
+            # 1. Render History First
             if chat_history:
-                # Display in a clean chat interface
                 with chat_container:
                     for idx, exchange in enumerate(chat_history):
-                        # Student question bubble
                         with st.chat_message("user", avatar="👤"):
                             st.write(exchange['question'])
-                        
-                        # AI answer bubble
                         with st.chat_message("assistant", avatar="🎓"):
                             st.write(exchange['answer'])
-                        
                         st.markdown("<br>", unsafe_allow_html=True)
             else:
-                # Welcome message when no chat history
                 st.info(f"""
                 👋 **Welcome to your interactive AI tutor!**
-                
-                I'm here to help you master **{selected_chapter_name}**. Ask me anything:
-                - Explain concepts in simple terms
-                - Solve numerical problems step-by-step  
-                - Clarify doubts from your textbook
-                - Get exam tips and shortcuts
-                - Real-world applications
-                
-                💡 Try the suggested questions on the right to get started!
+                I'm here to help you master **{selected_chapter_name}**. Ask me anything!
                 """)
-            
-            # Input area - always at bottom
-            # Input area - using st.chat_input for better experience
-            if prompt := st.chat_input("Type your question here..."):
+
+            # 2. Handle New Input
+            if submit_clicked and user_question:
                 # Append user question to UI immediately
                 with chat_container:
                      with st.chat_message("user", avatar="👤"):
-                         st.write(prompt)
+                         st.write(user_question)
                      
-                     # Placeholder for AI response
                      with st.chat_message("assistant", avatar="🎓"):
                          message_placeholder = st.empty()
                          full_response = ""
                          
-                         # Stream response
                          try:
-                             # Initial Loading state
-                             message_placeholder.write("Thinking...")
-                             
-                             for chunk in chatbot.ask_stream(prompt):
+                             message_placeholder.write("Thinking (Turbo Mode)...")
+                             for chunk in chatbot.ask_stream(user_question):
                                  full_response += chunk
-                                 # Update placeholder with accumulated text
                                  message_placeholder.markdown(full_response)
-                             
                              st.rerun()
                          except Exception as e:
                              st.error(f"❌ Error: {str(e)}")
-            
-            # Clear Chat logic moved to right sidebar to fix layout issue
             
         with col_chat_sidebar:
             # Clear Chat Button - Top of sidebar

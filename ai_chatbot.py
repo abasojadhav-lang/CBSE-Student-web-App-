@@ -32,29 +32,22 @@ class ChapterChatbot:
         # Initialize AI model with context
         if GEMINI_API_KEY:
             try:
-                # Use confirmed working model from API
-                self.model = genai.GenerativeModel('models/gemini-flash-latest')
+                # Use Gemini 2.0 Flash for high-speed, accurate math responses
+                self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
             except:
                 self.model = None
             
-            # System context
-            self.system_context = f"""You are an expert CBSE {subject} tutor helping a Class {class_num} student with the chapter: "{chapter}".
+            # System context - Optimized for direct answers
+            self.system_context = f"""You are an expert CBSE {subject} tutor for Class {class_num}. 
+Chapter: "{chapter}"
 
-YOUR ROLE:
-- Answer questions SPECIFICALLY about this chapter
-- Explain concepts clearly with examples
-- Provide step-by-step solutions for problems
-- Give exam-focused tips and shortcuts
-- Correct misconceptions patiently
+INSTRUCTIONS:
+1. **Direct Answer**: Start with the direct answer/solution immediately.
+2. **Step-by-Step Layout**: For math problems, use clear steps with LaTeX ($x^2$).
+3. **Be Concise**: No fluff. Short, punchy explanations.
+4. **Formatting**: Use bold headings and bullet points.
 
-GUIDELINES:
-- Keep responses concise (2-3 paragraphs max)
-- Use simple language
-- Give examples from the NCERT textbook when possible
-- If asked about formulas, explain when and how to use them
-- If student seems confused, break down the concept further
-
-Stay focused on "{chapter}" - if asked about other chapters, gently redirect to this topic.
+Solve the problem ACCURATELY and FAST.
 """
         else:
             self.model = None
