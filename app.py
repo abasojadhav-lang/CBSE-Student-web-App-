@@ -1177,25 +1177,40 @@ if selected_chapter_name != "Select a Chapter...":
             # Chat history display
             chat_history = chatbot.get_history()
             
+            # Helper to handle question submission
+            def handle_question():
+                if st.session_state.ai_user_question:
+                    user_q = st.session_state.ai_user_question
+                    # Generate response immediately
+                    chatbot.ask(user_q) # Use non-streaming for reliability in this layout
+                    st.session_state.ai_user_question = "" # Clear input
+            
             # Input area - MOVED TO TOP as per user request
             with st.container():
-                with st.form(key="ai_tutor_form", clear_on_submit=True):
-                    col_input, col_btn = st.columns([5, 1])
-                    with col_input:
-                        user_question = st.text_input(
-                            "Ask a question", 
-                            placeholder="Type your question here...",
-                            label_visibility="collapsed"
-                        )
-                    with col_btn:
-                        submit_clicked = st.form_submit_button("📤 Ask", type="primary", use_container_width=True)
+                col_input, col_btn = st.columns([5, 1])
+                with col_input:
+                    st.text_input(
+                        "Ask a question", 
+                        placeholder="Type your question here...",
+                        label_visibility="collapsed",
+                        key="ai_user_question",
+                        on_change=handle_question
+                    )
+                with col_btn:
+                    if st.button("📤 Ask", type="primary", use_container_width=True):
+                        handle_question()
+                        st.rerun()
 
             # Container for chat messages
             chat_container = st.container(height=500)
             
-            # 1. Render History First
+            # Render History (which now includes the new Q&A)
             if chat_history:
                 with chat_container:
+                    # Invert order: Newest at top? User asked for "Reverse".
+                    # "Type question is below and answer is up. do reverse."
+                    # Means standard: Input Top -> History Bottom (Newest at bottom of container)
+                    
                     for idx, exchange in enumerate(chat_history):
                         with st.chat_message("user", avatar="👤"):
                             st.write(exchange['question'])
@@ -1207,26 +1222,8 @@ if selected_chapter_name != "Select a Chapter...":
                 👋 **Welcome to your interactive AI tutor!**
                 I'm here to help you master **{selected_chapter_name}**. Ask me anything!
                 """)
-
-            # 2. Handle New Input
-            if submit_clicked and user_question:
-                # Append user question to UI immediately
-                with chat_container:
-                     with st.chat_message("user", avatar="👤"):
-                         st.write(user_question)
-                     
-                     with st.chat_message("assistant", avatar="🎓"):
-                         message_placeholder = st.empty()
-                         full_response = ""
-                         
-                         try:
-                             message_placeholder.write("Thinking (Turbo Mode)...")
-                             for chunk in chatbot.ask_stream(user_question):
-                                 full_response += chunk
-                                 message_placeholder.markdown(full_response)
-                             st.rerun()
-                         except Exception as e:
-                             st.error(f"❌ Error: {str(e)}")
+            
+            # Removed the "submitted" block because handle_question updates history directly
             
         with col_chat_sidebar:
             # Clear Chat Button - Top of sidebar
