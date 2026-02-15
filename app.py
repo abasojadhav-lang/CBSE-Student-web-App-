@@ -1185,30 +1185,12 @@ if selected_chapter_name != "Select a Chapter...":
                 with chat_container:
                     for idx, exchange in enumerate(chat_history):
                         # Student question bubble
-                        st.markdown(f"""
-                        <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
-                                    padding: 15px; 
-                                    border-radius: 15px 15px 5px 15px; 
-                                    margin: 10px 0; 
-                                    margin-left: 20%;
-                                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                            <strong style="color: #60a5fa;">🙋 You:</strong><br>
-                            <span style="color: #e0e7ff; font-size: 1.05em;">{exchange['question']}</span>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        with st.chat_message("user", avatar="👤"):
+                            st.write(exchange['question'])
                         
                         # AI answer bubble
-                        st.markdown(f"""
-                        <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
-                                    padding: 15px; 
-                                    border-radius: 15px 15px 15px 5px; 
-                                    margin: 10px 0; 
-                                    margin-right: 20%;
-                                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                            <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
-                            <span style="color: #d1fae5; font-size: 1.05em; line-height: 1.6;">{exchange['answer'].replace(chr(10), '<br>')}</span>
-                        </div>
-                        """, unsafe_allow_html=True)
+                        with st.chat_message("assistant", avatar="🎓"):
+                            st.write(exchange['answer'])
                         
                         st.markdown("<br>", unsafe_allow_html=True)
             else:
@@ -1245,54 +1227,27 @@ if selected_chapter_name != "Select a Chapter...":
                     if user_question and user_question.strip():
                         # Append user question to UI immediately
                         with chat_container:
-                             st.markdown(f"""
-                                <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
-                                            padding: 15px; 
-                                            border-radius: 15px 15px 5px 15px; 
-                                            margin: 10px 0; 
-                                            margin-left: 20%;
-                                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                                    <strong style="color: #60a5fa;">🙋 You:</strong><br>
-                                    <span style="color: #e0e7ff; font-size: 1.05em;">{user_question}</span>
-                                </div>
-                                """, unsafe_allow_html=True)
+                             with st.chat_message("user", avatar="👤"):
+                                 st.write(user_question)
                              
                              # Placeholder for AI response
-                             message_placeholder = st.empty()
-                             full_response = ""
-                             
-                             # Stream response
-                             try:
-                                 # Initial Loading state
-                                 message_placeholder.markdown("""
-                                    <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
-                                                padding: 15px; 
-                                                border-radius: 15px 15px 15px 5px; 
-                                                margin: 10px 0; 
-                                                margin-right: 20%;
-                                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                                        <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
-                                        <span style="color: #d1fae5;">Thinking...</span>
-                                    </div>""", unsafe_allow_html=True)
+                             with st.chat_message("assistant", avatar="🎓"):
+                                 message_placeholder = st.empty()
+                                 full_response = ""
                                  
-                                 for chunk in chatbot.ask_stream(user_question):
-                                     full_response += chunk
-                                     # Update placeholder with accumulated text
-                                     message_placeholder.markdown(f"""
-                                        <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
-                                                    padding: 15px; 
-                                                    border-radius: 15px 15px 15px 5px; 
-                                                    margin: 10px 0; 
-                                                    margin-right: 20%;
-                                                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                                            <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
-                                            <span style="color: #d1fae5; font-size: 1.05em; line-height: 1.6;">{full_response.replace(chr(10), '<br>')}</span>
-                                        </div>
-                                        """, unsafe_allow_html=True)
-                                 
-                                 st.rerun()
-                             except Exception as e:
-                                 st.error(f"❌ Error: {str(e)}")
+                                 # Stream response
+                                 try:
+                                     # Initial Loading state
+                                     message_placeholder.write("Thinking...")
+                                     
+                                     for chunk in chatbot.ask_stream(user_question):
+                                         full_response += chunk
+                                         # Update placeholder with accumulated text
+                                         message_placeholder.markdown(full_response)
+                                     
+                                     st.rerun()
+                                 except Exception as e:
+                                     st.error(f"❌ Error: {str(e)}")
 
                     else:
                         st.warning("Please enter a question!")
@@ -1317,51 +1272,24 @@ if selected_chapter_name != "Select a Chapter...":
                 ):
                     # Append user question to UI
                     with chat_container:
-                         st.markdown(f"""
-                            <div style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); 
-                                        padding: 15px; 
-                                        border-radius: 15px 15px 5px 15px; 
-                                        margin: 10px 0; 
-                                        margin-left: 20%;
-                                        box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                                <strong style="color: #60a5fa;">🙋 You:</strong><br>
-                                <span style="color: #e0e7ff; font-size: 1.05em;">{suggestion}</span>
-                            </div>
-                            """, unsafe_allow_html=True)
+                         with st.chat_message("user", avatar="👤"):
+                             st.write(suggestion)
                          
-                         message_placeholder = st.empty()
-                         full_response = ""
-                         
-                         try:
-                             # Initial Loading state
-                             message_placeholder.markdown("""
-                                <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
-                                            padding: 15px; 
-                                            border-radius: 15px 15px 15px 5px; 
-                                            margin: 10px 0; 
-                                            margin-right: 20%;
-                                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                                    <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
-                                    <span style="color: #d1fae5;">Thinking...</span>
-                                </div>""", unsafe_allow_html=True)
+                         with st.chat_message("assistant", avatar="🎓"):
+                             message_placeholder = st.empty()
+                             full_response = ""
                              
-                             for chunk in chatbot.ask_stream(suggestion):
-                                 full_response += chunk
-                                 message_placeholder.markdown(f"""
-                                    <div style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); 
-                                                padding: 15px; 
-                                                border-radius: 15px 15px 15px 5px; 
-                                                margin: 10px 0; 
-                                                margin-right: 20%;
-                                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-                                        <strong style="color: #6ee7b7;">🎓 AI Tutor:</strong><br>
-                                        <span style="color: #d1fae5; font-size: 1.05em; line-height: 1.6;">{full_response.replace(chr(10), '<br>')}</span>
-                                    </div>
-                                    """, unsafe_allow_html=True)
-                             
-                             st.rerun()
-                         except Exception as e:
-                             st.error(f"❌ Error: {str(e)}")
+                             try:
+                                 # Initial Loading state
+                                 message_placeholder.write("Thinking...")
+                                 
+                                 for chunk in chatbot.ask_stream(suggestion):
+                                     full_response += chunk
+                                     message_placeholder.markdown(full_response)
+                                 
+                                 st.rerun()
+                             except Exception as e:
+                                 st.error(f"❌ Error: {str(e)}")
             
             st.divider()
             
