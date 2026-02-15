@@ -4,11 +4,18 @@ Provides conversational AI assistant for chapter-specific Q&A
 """
 
 import os
+import streamlit as st
 import google.generativeai as genai
 from typing import List, Dict, Optional
 
-# Configure Gemini API
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+# Configure Gemini API - Support both local and Streamlit Cloud
+try:
+    # First try Streamlit secrets (for cloud deployment)
+    GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", "")
+except:
+    # Fallback to environment variable (for local development)
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
