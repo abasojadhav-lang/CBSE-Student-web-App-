@@ -1235,12 +1235,14 @@ if selected_chapter_name != "Select a Chapter...":
                          except Exception as e:
                              st.error(f"❌ Error: {str(e)}")
             
-            with col_clear:
-                if st.button("🗑️ Clear Chat", use_container_width=True):
-                    chatbot.clear_history()
-                    st.rerun()
-        
+            # Clear Chat logic moved to right sidebar to fix layout issue
+            
         with col_chat_sidebar:
+            # Clear Chat Button - Top of sidebar
+            if st.button("🗑️ Clear Chat History", use_container_width=True, type="secondary"):
+                chatbot.clear_history()
+                st.rerun()
+            
             st.markdown("### 💡 Quick Start")
             
             st.markdown("**Suggested Questions:**")
